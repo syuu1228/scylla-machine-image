@@ -80,6 +80,12 @@
         "sudo {{user `python`}} /home/{{user `ssh_username`}}/scylla_install_ami {{ user `install_args` }}"
       ],
       "type": "shell"
+    },
+    {
+      "source": "/home/{{user `ssh_username`}}/scylla-packages.txt",
+      "destination": "build/",
+      "direction": "download",
+      "type": "file"
     }
   ],
   "variables": {
