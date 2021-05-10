@@ -61,6 +61,7 @@ if __name__ == '__main__':
                         help='repository for install, specify .repo/.list file URL')
     parser.add_argument('--repo-for-update',
                         help='repository for update, specify .repo/.list file URL')
+    parser.add_argument('--target-cloud', choices=['aws', 'gce'], help='specify target cloud')
     args = parser.parse_args()
 
     if args.repo:
@@ -105,10 +106,17 @@ if __name__ == '__main__':
         if args.repo_for_update:
             run('curl -L -o /etc/apt/sources.list.d/scylla.list {REPO_FOR_UPDATE}'.format(REPO_FOR_UPDATE=args.repo_for_update))
 
+    if args.target_cloud == 'aws':
+        setup_opt = '--ntp-domain amazon'
+        sysconfig_opt = '--set-clocksource'
+    elif args.target_cloud == 'gce':
+        setup_opt = ''
+        sysconfig_opt = '--disable-writeback-cache'
+
     run('systemctl daemon-reload')
     run('systemctl enable scylla-image-setup.service')
-    run('/opt/scylladb/scripts/scylla_setup --ntp-domain amazon --no-coredump-setup --no-sysconfig-setup --no-raid-setup --no-io-setup --no-bootparam-setup --no-ec2-check --no-swap-setup')
-    run('/opt/scylladb/scripts/scylla_sysconfig_setup --ami --set-clocksource')
+    run('/opt/scylladb/scripts/scylla_setup --no-coredump-setup --no-sysconfig-setup --no-raid-setup --no-io-setup --no-bootparam-setup --no-ec2-check --no-swap-setup {}'.format(setup_opt))
+    run('/opt/scylladb/scripts/scylla_sysconfig_setup --ami {}'.format(sysconfig_opt))
     run('/opt/scylladb/scripts/scylla_bootparam_setup --ami')
     os.remove('{}/.ssh/authorized_keys'.format(homedir))
     os.remove('/var/lib/scylla-housekeeping/housekeeping.uuid')
@@ -125,40 +133,44 @@ if __name__ == '__main__':
     else:
         run('grub-mkconfig -o /boot/grub/grub.cfg')
 
-    with open('/etc/cloud/cloud.cfg') as f:
-        lines = f.readlines()
-    s = StringIO()
-    for l in lines:
-        if not re.match(r'^ - mounts\n$', l):
-            s.write(l)
-    cfg = s.getvalue()
-    s.close()
     if distro == 'centos':
-        cfg = re.sub('^ssh_deletekeys:   0', 'ssh_deletekeys:   1', cfg, flags=re.MULTILINE)
-        cfg = re.sub('^    name: centos', '    name: scyllaadm', cfg, flags=re.MULTILINE)
+        profile = '/etc/skel/.bash_profile'
     else:
-        cfg = re.sub('^preserve_hostname: false', 'preserve_hostname: false\n\nssh_deletekeys: true', cfg, flags=re.MULTILINE)
-        cfg = re.sub('^     name: ubuntu', '     name: scyllaadm', cfg, flags=re.MULTILINE)
-    with open('/etc/cloud/cloud.cfg', 'w') as f:
-        f.write(cfg)
-    run('userdel -r -f {}'.format(distro))
-    run('cloud-init clean')
-    run('cloud-init init')
-    run('ln -sf /home/scyllaadm {}'.format(homedir))
-    for skel in glob.glob('/etc/skel/.*'):
-        shutil.copy(skel, '/home/scyllaadm')
-        os.chown(skel, 1000, 1000)
-    if distro == 'centos':
-        profile = '/home/scyllaadm/.bash_profile'
-    else:
-        profile = '/home/scyllaadm/.profile'
+        profile = '/etc/skel/.profile'
     with open(profile, 'a') as f:
         f.write('\n\n/opt/scylladb/scylla-machine-image/scylla_login\n')
-    run('useradd -o -u 1000 -g scyllaadm -s /bin/bash -d /home/scyllaadm centos')
-    run('groupadd -o -g 1000 centos')
-    if distro == 'ubuntu':
-        run('useradd -o -u 1000 -g scyllaadm -s /bin/bash -d /home/scyllaadm ubuntu')
-        run('groupadd -o -g 1000 ubuntu')
+
+    if args.target_cloud == 'aws':
+        with open('/etc/cloud/cloud.cfg') as f:
+            lines = f.readlines()
+        s = StringIO()
+        for l in lines:
+            if not re.match(r'^ - mounts\n$', l):
+                s.write(l)
+        cfg = s.getvalue()
+        s.close()
+        if distro == 'centos':
+            cfg = re.sub('^ssh_deletekeys:   0', 'ssh_deletekeys:   1', cfg, flags=re.MULTILINE)
+            cfg = re.sub('^    name: centos', '    name: scyllaadm', cfg, flags=re.MULTILINE)
+        else:
+            cfg = re.sub('^preserve_hostname: false', 'preserve_hostname: false\n\nssh_deletekeys: true', cfg, flags=re.MULTILINE)
+            cfg = re.sub('^     name: ubuntu', '     name: scyllaadm', cfg, flags=re.MULTILINE)
+        with open('/etc/cloud/cloud.cfg', 'w') as f:
+            f.write(cfg)
+
+        run('userdel -r -f {}'.format(distro))
+        run('cloud-init clean')
+        run('cloud-init init')
+        run('ln -sf /home/scyllaadm {}'.format(homedir))
+        for skel in glob.glob('/etc/skel/.*'):
+            shutil.copy(skel, '/home/scyllaadm')
+            os.chown(skel, 1000, 1000)
+
+        run('useradd -o -u 1000 -g scyllaadm -s /bin/bash -d /home/scyllaadm centos')
+        run('groupadd -o -g 1000 centos')
+        if distro == 'ubuntu':
+            run('useradd -o -u 1000 -g scyllaadm -s /bin/bash -d /home/scyllaadm ubuntu')
+            run('groupadd -o -g 1000 ubuntu')
 
     if distro == 'centos':
         # We need to install LTS kernel for the AMI.

@@ -206,6 +206,8 @@ echo "Calling Packer..."
   -var scylla_tools_version="$SCYLLA_TOOLS_VERSION" \
   -var scylla_python3_version="$SCYLLA_PYTHON3_VERSION" \
   -var scylla_build_id="$BUILD_ID" \
+  -var scylla_branch_version="$BRANCH_VERSION" \
+  -var python="/usr/bin/python3" \
   scylla_gce.json
 
 # For some errors packer gives a success status even if fails.
