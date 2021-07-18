@@ -39,8 +39,13 @@
       "type": "file"
     },
     {
+      "destination": "/home/{{user `ssh_username`}}/",
+      "source": "../../packer/scylla_install_image",
+      "type": "file"
+    },
+    {
       "inline": [
-        "sudo /home/{{user `ssh_username`}}/scylla_install_image {{ user `install_args` }}"
+        "sudo /home/{{user `ssh_username`}}/scylla_install_image --target-cloud gce {{ user `install_args` }}"
       ],
       "type": "shell"
     }

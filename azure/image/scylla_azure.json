@@ -34,8 +34,13 @@
       "type": "file"
     },
     {
+      "destination": "/home/{{user `ssh_username`}}/",
+      "source": "../../packer/scylla_install_image",
+      "type": "file"
+    },
+    {
       "inline": [
-        "sudo {{user `python`}} /home/{{user `ssh_username`}}/scylla_install_azure {{ user `install_args` }}"
+        "sudo {{user `python`}} /home/{{user `ssh_username`}}/scylla_install_image --target-cloud azure {{ user `install_args` }}"
       ],
       "type": "shell"
     }
