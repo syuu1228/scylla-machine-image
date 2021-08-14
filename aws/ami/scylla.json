@@ -83,7 +83,8 @@
     {
       "inline": [
         "sudo /usr/bin/cloud-init status --wait",
-        "sudo {{user `python`}} /home/{{user `ssh_username`}}/scylla_install_image --target-cloud aws {{ user `install_args` }}"
+        "if [ -f /etc/debian_version ]; then sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.8 1; fi",
+        "sudo /home/{{user `ssh_username`}}/scylla_install_image --target-cloud aws {{ user `install_args` }}"
       ],
       "type": "shell"
     }
@@ -99,8 +100,7 @@
     "security_group_id": "",
     "source_ami": "",
     "ssh_username": "",
-    "subnet_id": "",
-    "python": ""
+    "subnet_id": ""
   }
 }
 

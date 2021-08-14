@@ -45,7 +45,8 @@
     },
     {
       "inline": [
-        "sudo {{user `python`}} /home/{{user `ssh_username`}}/scylla_install_image --target-cloud gce {{ user `install_args` }}"
+        "if [ -f /etc/debian_version ]; then sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.8 1; fi",
+        "sudo /home/{{user `ssh_username`}}/scylla_install_image --target-cloud gce {{ user `install_args` }}"
       ],
       "type": "shell"
     }
@@ -58,7 +59,6 @@
     "image_storage_location": "",
     "instance_type": "",
     "ssh_username": "",
-    "source_image_family": "",
-    "python": ""
+    "source_image_family": ""
   }
 }
