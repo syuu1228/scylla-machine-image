@@ -44,7 +44,7 @@
     },
     {
       "inline": [
-        "sudo /home/{{user `ssh_username`}}/scylla_install_image --target-cloud gce {{ user `install_args` }}"
+        "sudo {{user `python`}} /home/{{user `ssh_username`}}/scylla_install_image --target-cloud gce {{ user `install_args` }}"
       ],
       "type": "shell"
     }
@@ -57,6 +57,7 @@
     "image_storage_location": "",
     "instance_type": "",
     "ssh_username": "",
-    "source_image_family": ""
+    "source_image_family": "",
+    "python": ""
   }
 }

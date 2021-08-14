@@ -40,7 +40,7 @@
     },
     {
       "inline": [
-        "sudo {{user `python`}} /home/{{user `ssh_username`}}/scylla_install_image --target-cloud azure {{ user `install_args` }}"
+        "sudo /usr/bin/python3 /home/{{user `ssh_username`}}/scylla_install_image --target-cloud azure {{ user `install_args` }}"
       ],
       "type": "shell"
     }
