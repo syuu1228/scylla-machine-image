@@ -171,7 +171,11 @@ if __name__ == '__main__':
     with open(profile, 'a') as f:
         f.write('\n\n/opt/scylladb/scylla-machine-image/scylla_login\n')
 
-    if args.target_cloud == 'aws' or args.target_cloud == 'azure':
+    # On AWS, ssh user is statically created at AMI building time, so we need to
+    # change it to 'scyllaadm`.
+    # However, on GCE and Azure ssh user is dynamically created at instance startup
+    # time, and username is specified while launching the instance, so we have nothing    # to do.
+    if args.target_cloud == 'aws':
         with open('/etc/cloud/cloud.cfg') as f:
             lines = f.readlines()
         s = StringIO()
@@ -209,7 +213,7 @@ if __name__ == '__main__':
         with open('/etc/hosts', 'a') as f:
             f.write('\n\n169.254.169.254    metadata.azure.internal\n')
 
-    # On GCP CentOS is 8, don't need to install LTS kernel
+    # GCP CentOS is 8, don't need to install LTS kernel
     if args.target_cloud == 'aws' and distro == 'centos':
         # We need to install LTS kernel for the AMI.
         # However, elrepo-kernel only provides x86_64 package,
