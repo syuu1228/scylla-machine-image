@@ -14,9 +14,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-docker build  . -t scylladb/packer-builder
+REALDIR=$(dirname $(readlink -f "$0"))
+DIR=$(dirname $(realpath -se $0))
+PDIRNAME=$(basename $(realpath -se $DIR/..))
 
-DOCKER_ID=$(docker run -e AWS_SECRET_ACCESS_KEY -e AWS_ACCESS_KEY_ID -d  -v $HOME/.aws:/root/.aws -v `pwd`/../..:/scylla-machine-image scylladb/packer-builder /bin/bash -c "cd /scylla-machine-image/aws/ami; ./build_ami.sh $*")
+if [ "$PDIRNAME" = "aws" ] || [ "$PDIRNAME" = "gce" ] || [ "$PDIRNAME" = "azure" ]; then
+    TARGET="$PDIRNAME"
+else
+    echo "no target detected"
+    exit 1
+fi
+
+docker build -f $REALDIR/Dockerfile . -t scylladb/packer-builder
+
+DOCKER_ID=$(docker run -e AWS_SECRET_ACCESS_KEY -e AWS_ACCESS_KEY_ID -d  -v $HOME/.aws:/root/.aws -v `pwd`/../..:/scylla-machine-image scylladb/packer-builder /bin/bash -c "cd /scylla-machine-image/; ./packer/build_image.sh --target $TARGET $*")
 
 kill_it() {
     if [[ -n "$DOCKER_ID" ]]; then

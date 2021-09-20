@@ -14,9 +14,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-docker build -f Dockerfile_deb . -t scylladb/packer-builder-deb
+REALDIR=$(dirname $(readlink -f "$0"))
+DIR=$(dirname $(realpath -se $0))
+PDIRNAME=$(basename $(realpath -se $DIR/..))
 
-DOCKER_ID=$(docker run -d  -v `pwd`/../..:/scylla-machine-image scylladb/packer-builder-deb /bin/bash -c "cd /scylla-machine-image/azure/image; ./build_azure_image.sh $*")
+if [ "$PDIRNAME" = "aws" ] || [ "$PDIRNAME" = "gce" ] || [ "$PDIRNAME" = "azure" ]; then
+    TARGET="$PDIRNAME"
+else
+    echo "no target detected"
+    exit 1
+fi
+
+docker build -f $REALDIR/Dockerfile_deb . -t scylladb/packer-builder-deb
+
+DOCKER_ID=$(docker run -e AWS_SECRET_ACCESS_KEY -e AWS_ACCESS_KEY_ID -d  -v $HOME/.aws:/root/.aws -v `pwd`/../..:/scylla-machine-image scylladb/packer-builder-deb /bin/bash -c "cd /scylla-machine-image/; ./packer/build_deb_image.sh --target $TARGET $*")
 
 kill_it() {
     if [[ -n "$DOCKER_ID" ]]; then
@@ -47,8 +58,9 @@ trap - SIGTERM SIGINT SIGHUP EXIT
 docker run --rm \
     --entrypoint /bin/sh \
     -e HOST_UID=`id -u` \
-    -v `pwd`:/azure \
+    -v `pwd`:/ami \
     scylladb/packer-builder-deb \
-    -c "chown -R `stat -c \"%u:%g\" $(pwd)` /azure/" || true
+    -c "chown -R `stat -c \"%u:%g\" $(pwd)` /ami/" || true
 
 exit "$exitcode"
+
