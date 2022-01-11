@@ -126,6 +126,21 @@
       },
       "location": "{{user `region`}}",
       "vm_size": "{{user `vm_size`}}"
+    },
+    {
+        "name": "docker",
+        "type": "docker",
+        "image": "docker.io/ubuntu:20.04",
+        "export_path": "build/scylla-docker.tar",
+        "changes": [
+            "ENV PATH /opt/scylladb/python3/bin:/usr/bin:/usr/sbin",
+            "ENV LANG en_US.UTF-8",
+            "ENV LANGUAGE en_US:en",
+            "ENV LC_ALL en_US.UTF-8",
+            "ENTRYPOINT /usr/sbin/init",
+            "EXPOSE 10000 9042 9160 9180 7000 7001 22",
+            "VOLUME /var/lib/scylla"
+        ]
     }
   ],
   "provisioners": [
@@ -141,6 +156,7 @@
     },
     {
       "inline": [
+        "if [ {{build_name}} = docker ]; then apt-get update; apt-get install -y sudo python3 gnupg curl; fi",
         "if [ {{build_name}} = aws ]; then sudo /usr/bin/cloud-init status --wait; fi",
         "if [ -f /etc/debian_version ]; then sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.8 1; fi",
         "if [ {{build_name}} = gce ] && [ -f /etc/redhat-release ]; then sudo alternatives --set python /usr/bin/python3; fi",

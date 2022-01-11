@@ -66,7 +66,7 @@ if __name__ == '__main__':
                         help='repository for install, specify .repo/.list file URL')
     parser.add_argument('--repo-for-update',
                         help='repository for update, specify .repo/.list file URL')
-    parser.add_argument('--target-cloud', choices=['aws', 'gce', 'azure'], help='specify target cloud')
+    parser.add_argument('--target-cloud', choices=['aws', 'gce', 'azure', 'docker'], help='specify target cloud')
     args = parser.parse_args()
 
     if args.repo:
@@ -145,35 +145,38 @@ if __name__ == '__main__':
         setup_opt = ''
         sysconfig_opt = '--disable-writeback-cache'
 
-    run('systemctl daemon-reload')
-    run('systemctl enable scylla-image-setup.service')
-    run('systemctl enable scylla-image-post-start.service')
-    run('/opt/scylladb/scripts/scylla_setup --no-coredump-setup --no-sysconfig-setup --no-raid-setup --no-io-setup --no-bootparam-setup --no-ec2-check --no-swap-setup --no-cpuscaling-setup')
+#    run('systemctl daemon-reload')
+#    run('systemctl enable scylla-image-setup.service')
+#    run('systemctl enable scylla-image-post-start.service')
+    with open('/etc/scylla.d/housekeeping.cfg', 'w') as f:
+        f.write('')
+    run('/opt/scylladb/scripts/scylla_setup --no-kernel-check --no-enable-service --no-ntp-setup --no-node-exporter --no-fstrim-setup --no-coredump-setup --no-sysconfig-setup --no-raid-setup --no-io-setup --no-bootparam-setup --no-ec2-check --no-swap-setup --no-cpuscaling-setup')
+    os.remove('/etc/scylla.d/housekeeping.cfg')
 
     # The difference comes from two different services to configure CPU scaling.
     # On CentOS 'cpupower' fails when CPU scaling is not supported, so we can't
     # enable it here.
     # On Ubuntu 'cpufrequtils' never fails even CPU scaling is not supported,
     # so we want to enable it here.
-    if distro == 'centos':
-        run('yum install -y cpupowerutils')
-    else:
-        run('/opt/scylladb/scripts/scylla_cpuscaling_setup --force')
+#    if distro == 'centos':
+#        run('yum install -y cpupowerutils')
+#    else:
+#        run('/opt/scylladb/scripts/scylla_cpuscaling_setup --force')
 
     run('/opt/scylladb/scripts/scylla_sysconfig_setup --ami --set-clocksource {}'.format(sysconfig_opt))
-    run('/opt/scylladb/scripts/scylla_bootparam_setup --ami')
+#    run('/opt/scylladb/scripts/scylla_bootparam_setup --ami')
     os.remove('{}/.ssh/authorized_keys'.format(homedir))
     os.remove('/var/lib/scylla-housekeeping/housekeeping.uuid')
 
-    with open('/etc/default/grub') as f:
-        grub = f.read()
-    grub = re.sub(r'^GRUB_CMDLINE_LINUX="(.+)"$', r'GRUB_CMDLINE_LINUX="\1 net.ifnames=0"', grub, flags=re.MULTILINE)
-    with open('/etc/default/grub', 'w') as f:
-        f.write(grub)
-    if distro == 'centos':
-        run('grub2-mkconfig -o /boot/grub2/grub.cfg')
-    else:
-        run('grub-mkconfig -o /boot/grub/grub.cfg')
+#    with open('/etc/default/grub') as f:
+#        grub = f.read()
+#    grub = re.sub(r'^GRUB_CMDLINE_LINUX="(.+)"$', r'GRUB_CMDLINE_LINUX="\1 net.ifnames=0"', grub, flags=re.MULTILINE)
+#    with open('/etc/default/grub', 'w') as f:
+#        f.write(grub)
+#    if distro == 'centos':
+#        run('grub2-mkconfig -o /boot/grub2/grub.cfg')
+#    else:
+#        run('grub-mkconfig -o /boot/grub/grub.cfg')
 
     if distro == 'centos':
         profile = '/etc/skel/.bash_profile'

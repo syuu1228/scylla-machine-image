@@ -29,7 +29,7 @@ DEBUG=false
 TARGET=
 
 if [ -L "$0" ]; then
-    if [ "$PDIRNAME" = "aws" ] || [ "$PDIRNAME" = "gce" ] || [ "$PDIRNAME" = "azure" ]; then
+    if [ "$PDIRNAME" = "aws" ] || [ "$PDIRNAME" = "gce" ] || [ "$PDIRNAME" = "azure" ] || [ "$PDIRNAME" = "docker" ]; then
         TARGET="$PDIRNAME"
     else
         echo "no target detected"
@@ -139,6 +139,9 @@ while [ $# -gt 0 ]; do
                 ;;
               "azure")
                 DIR="$REALDIR/../$TARGET/azure"
+                ;;
+              "docker")
+                DIR="$REALDIR/../$TARGET/image"
                 ;;
               *)
                 print_usage
@@ -343,6 +346,8 @@ else
       grep "Builds finished. The artifacts of successful builds are:" $PACKER_LOG_PATH
       GREP_STATUS=$?
       ;;
+    "docker")
+      GREP_STATUS=0
     *)
       echo "No Target is defined"
       exit 1
