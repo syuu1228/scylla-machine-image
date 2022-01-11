@@ -116,6 +116,8 @@ while [ $# -gt 0 ]; do
                 DIR="$REALDIR/../$2/ami"
             elif [ "$2" = "gce" ] || [ "$2" = "azure" ]; then
                 DIR="$REALDIR/../$2/image"
+            elif [ "$2" = "docker" ]; then
+                DIR="$REALDIR/../$2/image"
             else
                 print_usage
             fi
