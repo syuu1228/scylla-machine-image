@@ -168,6 +168,16 @@
       "type": "file"
     },
     {
+      "destination": "/tmp/",
+      "source": "../../packer/iptables.sh",
+      "type": "file"
+    },
+    {
+      "destination": "/tmp/",
+      "source": "../../packer/remediation-script.sh",
+      "type": "file"
+    },
+    {
       "inline": [
         "if [ {{build_name}} = aws ]; then sudo /usr/bin/cloud-init status --wait; fi",
         "sudo /home/{{user `ssh_username`}}/scylla_install_image --target-cloud {{build_name}} --scylla-version {{user `scylla_full_version`}} {{user `install_args`}}"
