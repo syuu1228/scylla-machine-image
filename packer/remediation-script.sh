@@ -1935,254 +1935,254 @@ else
 fi
 # END fix for 'rsyslog_remote_loghost'
 
-###############################################################################
-# BEGIN fix (84 / 275) for 'package_iptables-persistent_installed'
-###############################################################################
-(>&2 echo "Remediating rule 84/275: 'package_iptables-persistent_installed'")
-# Remediation is applicable only in certain platforms
-
-var_firewall_package='iptables'
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ] || [ "$var_firewall_package" == "iptables" ]; then
-
-DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables-persistent"
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'package_iptables-persistent_installed'
-
-###############################################################################
-# BEGIN fix (85 / 275) for 'package_iptables_installed'
-###############################################################################
-(>&2 echo "Remediating rule 85/275: 'package_iptables_installed'")
-# Remediation is applicable only in certain platforms
-
-var_firewall_package='iptables'
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ] || [ "$var_firewall_package" == "iptables" ]; then
-
-DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables"
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'package_iptables_installed'
-
-###############################################################################
-# BEGIN fix (86 / 275) for 'package_iptables-persistent_removed'
-###############################################################################
-(>&2 echo "Remediating rule 86/275: 'package_iptables-persistent_removed'")
-# Remediation is applicable only in certain platforms
-
-var_firewall_package='iptables'
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ] || { [ -n "$var_firewall_package" ] && [ "$var_firewall_package" != "iptables" ] ; }; then
-
-# CAUTION: This remediation script will remove iptables-persistent
-#	   from the system, and may remove any packages
-#	   that depend on iptables-persistent. Execute this
-#	   remediation AFTER testing on a non-production
-#	   system!
-
-DEBIAN_FRONTEND=noninteractive apt-get remove -y "iptables-persistent"
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'package_iptables-persistent_removed'
-
-###############################################################################
-# BEGIN fix (87 / 275) for 'ip6tables_allow_in_lo'
-###############################################################################
-(>&2 echo "Remediating rule 87/275: 'ip6tables_allow_in_lo'")
-# Remediation is applicable only in certain platforms
-
-var_firewall_package='iptables'
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ] && { [ "$var_firewall_package" == "iptables" ]; }; then
-
-if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables" 2>/dev/null | grep -q installed; then
-    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables"
-fi
-
-if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables-persistent" 2>/dev/null | grep -q installed; then
-    
-    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v4 boolean true"
-    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v6 boolean true"
-    
-    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables-persistent"
-fi
-
-
-ip6tables -C INPUT -i lo -j ACCEPT 2>/dev/null || ip6tables -A INPUT -i lo -j ACCEPT
-ip6tables-save -t filter > /etc/iptables/rules.v6
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'ip6tables_allow_in_lo'
-
-###############################################################################
-# BEGIN fix (88 / 275) for 'ip6tables_allow_out_lo'
-###############################################################################
-(>&2 echo "Remediating rule 88/275: 'ip6tables_allow_out_lo'")
-# Remediation is applicable only in certain platforms
-
-var_firewall_package='iptables'
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ] && { [ "$var_firewall_package" == "iptables" ]; }; then
-
-if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables" 2>/dev/null | grep -q installed; then
-    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables"
-fi
-
-if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables-persistent" 2>/dev/null | grep -q installed; then
-    
-    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v4 boolean true"
-    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v6 boolean true"
-    
-    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables-persistent"
-fi
-
-
-ip6tables -C OUTPUT -o lo -j ACCEPT 2>/dev/null || ip6tables -A OUTPUT -o lo -j ACCEPT
-ip6tables-save -t filter > /etc/iptables/rules.v6
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'ip6tables_allow_out_lo'
-
-###############################################################################
-# BEGIN fix (89 / 275) for 'ip6tables_deny_in_other_for_localhost6'
-###############################################################################
-(>&2 echo "Remediating rule 89/275: 'ip6tables_deny_in_other_for_localhost6'")
-# Remediation is applicable only in certain platforms
-
-var_firewall_package='iptables'
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ] && { [ "$var_firewall_package" == "iptables" ]; }; then
-
-if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables" 2>/dev/null | grep -q installed; then
-    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables"
-fi
-
-if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables-persistent" 2>/dev/null | grep -q installed; then
-    
-    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v4 boolean true"
-    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v6 boolean true"
-    
-    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables-persistent"
-fi
-
-
-ip6tables -C INPUT -s ::1 -j DROP 2>/dev/null || ip6tables -A INPUT -s ::1 -j DROP
-ip6tables-save -t filter > /etc/iptables/rules.v6
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'ip6tables_deny_in_other_for_localhost6'
-
-###############################################################################
-# BEGIN fix (90 / 275) for 'iptables_allow_in_lo'
-###############################################################################
-(>&2 echo "Remediating rule 90/275: 'iptables_allow_in_lo'")
-# Remediation is applicable only in certain platforms
-
-var_firewall_package='iptables'
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ] && { [ "$var_firewall_package" == "iptables" ]; }; then
-
-if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables" 2>/dev/null | grep -q installed; then
-    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables"
-fi
-
-if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables-persistent" 2>/dev/null | grep -q installed; then
-    
-    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v4 boolean true"
-    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v6 boolean true"
-    
-    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables-persistent"
-fi
-
-
-iptables -C INPUT -i lo -j ACCEPT 2>/dev/null || iptables -A INPUT -i lo -j ACCEPT
-iptables-save -t filter > /etc/iptables/rules.v4
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'iptables_allow_in_lo'
-
-###############################################################################
-# BEGIN fix (91 / 275) for 'iptables_allow_out_lo'
-###############################################################################
-(>&2 echo "Remediating rule 91/275: 'iptables_allow_out_lo'")
-# Remediation is applicable only in certain platforms
-
-var_firewall_package='iptables'
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ] && { [ "$var_firewall_package" == "iptables" ]; }; then
-
-if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables" 2>/dev/null | grep -q installed; then
-    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables"
-fi
-
-if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables-persistent" 2>/dev/null | grep -q installed; then
-    
-    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v4 boolean true"
-    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v6 boolean true"
-    
-    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables-persistent"
-fi
-
-
-iptables -C OUTPUT -o lo -j ACCEPT 2>/dev/null || iptables -A OUTPUT -o lo -j ACCEPT
-iptables-save -t filter > /etc/iptables/rules.v4
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'iptables_allow_out_lo'
-
-###############################################################################
-# BEGIN fix (92 / 275) for 'iptables_deny_in_other_for_localhost'
-###############################################################################
-(>&2 echo "Remediating rule 92/275: 'iptables_deny_in_other_for_localhost'")
-# Remediation is applicable only in certain platforms
-
-var_firewall_package='iptables'
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ] && { [ "$var_firewall_package" == "iptables" ]; }; then
-
-if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables" 2>/dev/null | grep -q installed; then
-    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables"
-fi
-
-if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables-persistent" 2>/dev/null | grep -q installed; then
-    
-    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v4 boolean true"
-    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v6 boolean true"
-    
-    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables-persistent"
-fi
-
-
-iptables -C INPUT -s 127.0.0.0/8 -j DROP 2>/dev/null || iptables -A INPUT -s 127.0.0.0/8 -j DROP
-iptables-save -t filter > /etc/iptables/rules.v4
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'iptables_deny_in_other_for_localhost'
-
-###############################################################################
-# BEGIN fix (93 / 275) for 'ip6tables_default_deny'
-###############################################################################
-(>&2 echo "Remediating rule 93/275: 'ip6tables_default_deny'")
-# FIX FOR THIS RULE IS MISSING
-# END fix for 'ip6tables_default_deny'
-
-###############################################################################
-# BEGIN fix (94 / 275) for 'iptables_default_deny'
-###############################################################################
-(>&2 echo "Remediating rule 94/275: 'iptables_default_deny'")
-# FIX FOR THIS RULE IS MISSING
-# END fix for 'iptables_default_deny'
-
+################################################################################
+## BEGIN fix (84 / 275) for 'package_iptables-persistent_installed'
+################################################################################
+#(>&2 echo "Remediating rule 84/275: 'package_iptables-persistent_installed'")
+## Remediation is applicable only in certain platforms
+#
+#var_firewall_package='iptables'
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ] || [ "$var_firewall_package" == "iptables" ]; then
+#
+#DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables-persistent"
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'package_iptables-persistent_installed'
+#
+################################################################################
+## BEGIN fix (85 / 275) for 'package_iptables_installed'
+################################################################################
+#(>&2 echo "Remediating rule 85/275: 'package_iptables_installed'")
+## Remediation is applicable only in certain platforms
+#
+#var_firewall_package='iptables'
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ] || [ "$var_firewall_package" == "iptables" ]; then
+#
+#DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables"
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'package_iptables_installed'
+#
+################################################################################
+## BEGIN fix (86 / 275) for 'package_iptables-persistent_removed'
+################################################################################
+#(>&2 echo "Remediating rule 86/275: 'package_iptables-persistent_removed'")
+## Remediation is applicable only in certain platforms
+#
+#var_firewall_package='iptables'
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ] || { [ -n "$var_firewall_package" ] && [ "$var_firewall_package" != "iptables" ] ; }; then
+#
+## CAUTION: This remediation script will remove iptables-persistent
+##	   from the system, and may remove any packages
+##	   that depend on iptables-persistent. Execute this
+##	   remediation AFTER testing on a non-production
+##	   system!
+#
+#DEBIAN_FRONTEND=noninteractive apt-get remove -y "iptables-persistent"
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'package_iptables-persistent_removed'
+#
+################################################################################
+## BEGIN fix (87 / 275) for 'ip6tables_allow_in_lo'
+################################################################################
+#(>&2 echo "Remediating rule 87/275: 'ip6tables_allow_in_lo'")
+## Remediation is applicable only in certain platforms
+#
+#var_firewall_package='iptables'
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ] && { [ "$var_firewall_package" == "iptables" ]; }; then
+#
+#if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables" 2>/dev/null | grep -q installed; then
+#    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables"
+#fi
+#
+#if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables-persistent" 2>/dev/null | grep -q installed; then
+#    
+#    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v4 boolean true"
+#    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v6 boolean true"
+#    
+#    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables-persistent"
+#fi
+#
+#
+#ip6tables -C INPUT -i lo -j ACCEPT 2>/dev/null || ip6tables -A INPUT -i lo -j ACCEPT
+#ip6tables-save -t filter > /etc/iptables/rules.v6
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'ip6tables_allow_in_lo'
+#
+################################################################################
+## BEGIN fix (88 / 275) for 'ip6tables_allow_out_lo'
+################################################################################
+#(>&2 echo "Remediating rule 88/275: 'ip6tables_allow_out_lo'")
+## Remediation is applicable only in certain platforms
+#
+#var_firewall_package='iptables'
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ] && { [ "$var_firewall_package" == "iptables" ]; }; then
+#
+#if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables" 2>/dev/null | grep -q installed; then
+#    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables"
+#fi
+#
+#if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables-persistent" 2>/dev/null | grep -q installed; then
+#    
+#    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v4 boolean true"
+#    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v6 boolean true"
+#    
+#    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables-persistent"
+#fi
+#
+#
+#ip6tables -C OUTPUT -o lo -j ACCEPT 2>/dev/null || ip6tables -A OUTPUT -o lo -j ACCEPT
+#ip6tables-save -t filter > /etc/iptables/rules.v6
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'ip6tables_allow_out_lo'
+#
+################################################################################
+## BEGIN fix (89 / 275) for 'ip6tables_deny_in_other_for_localhost6'
+################################################################################
+#(>&2 echo "Remediating rule 89/275: 'ip6tables_deny_in_other_for_localhost6'")
+## Remediation is applicable only in certain platforms
+#
+#var_firewall_package='iptables'
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ] && { [ "$var_firewall_package" == "iptables" ]; }; then
+#
+#if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables" 2>/dev/null | grep -q installed; then
+#    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables"
+#fi
+#
+#if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables-persistent" 2>/dev/null | grep -q installed; then
+#    
+#    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v4 boolean true"
+#    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v6 boolean true"
+#    
+#    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables-persistent"
+#fi
+#
+#
+#ip6tables -C INPUT -s ::1 -j DROP 2>/dev/null || ip6tables -A INPUT -s ::1 -j DROP
+#ip6tables-save -t filter > /etc/iptables/rules.v6
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'ip6tables_deny_in_other_for_localhost6'
+#
+################################################################################
+## BEGIN fix (90 / 275) for 'iptables_allow_in_lo'
+################################################################################
+#(>&2 echo "Remediating rule 90/275: 'iptables_allow_in_lo'")
+## Remediation is applicable only in certain platforms
+#
+#var_firewall_package='iptables'
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ] && { [ "$var_firewall_package" == "iptables" ]; }; then
+#
+#if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables" 2>/dev/null | grep -q installed; then
+#    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables"
+#fi
+#
+#if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables-persistent" 2>/dev/null | grep -q installed; then
+#    
+#    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v4 boolean true"
+#    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v6 boolean true"
+#    
+#    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables-persistent"
+#fi
+#
+#
+#iptables -C INPUT -i lo -j ACCEPT 2>/dev/null || iptables -A INPUT -i lo -j ACCEPT
+#iptables-save -t filter > /etc/iptables/rules.v4
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'iptables_allow_in_lo'
+#
+################################################################################
+## BEGIN fix (91 / 275) for 'iptables_allow_out_lo'
+################################################################################
+#(>&2 echo "Remediating rule 91/275: 'iptables_allow_out_lo'")
+## Remediation is applicable only in certain platforms
+#
+#var_firewall_package='iptables'
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ] && { [ "$var_firewall_package" == "iptables" ]; }; then
+#
+#if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables" 2>/dev/null | grep -q installed; then
+#    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables"
+#fi
+#
+#if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables-persistent" 2>/dev/null | grep -q installed; then
+#    
+#    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v4 boolean true"
+#    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v6 boolean true"
+#    
+#    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables-persistent"
+#fi
+#
+#
+#iptables -C OUTPUT -o lo -j ACCEPT 2>/dev/null || iptables -A OUTPUT -o lo -j ACCEPT
+#iptables-save -t filter > /etc/iptables/rules.v4
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'iptables_allow_out_lo'
+#
+################################################################################
+## BEGIN fix (92 / 275) for 'iptables_deny_in_other_for_localhost'
+################################################################################
+#(>&2 echo "Remediating rule 92/275: 'iptables_deny_in_other_for_localhost'")
+## Remediation is applicable only in certain platforms
+#
+#var_firewall_package='iptables'
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ] && { [ "$var_firewall_package" == "iptables" ]; }; then
+#
+#if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables" 2>/dev/null | grep -q installed; then
+#    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables"
+#fi
+#
+#if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables-persistent" 2>/dev/null | grep -q installed; then
+#    
+#    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v4 boolean true"
+#    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v6 boolean true"
+#    
+#    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables-persistent"
+#fi
+#
+#
+#iptables -C INPUT -s 127.0.0.0/8 -j DROP 2>/dev/null || iptables -A INPUT -s 127.0.0.0/8 -j DROP
+#iptables-save -t filter > /etc/iptables/rules.v4
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'iptables_deny_in_other_for_localhost'
+#
+################################################################################
+## BEGIN fix (93 / 275) for 'ip6tables_default_deny'
+################################################################################
+#(>&2 echo "Remediating rule 93/275: 'ip6tables_default_deny'")
+## FIX FOR THIS RULE IS MISSING
+## END fix for 'ip6tables_default_deny'
+#
+################################################################################
+## BEGIN fix (94 / 275) for 'iptables_default_deny'
+################################################################################
+#(>&2 echo "Remediating rule 94/275: 'iptables_default_deny'")
+## FIX FOR THIS RULE IS MISSING
+## END fix for 'iptables_default_deny'
+#
 ###############################################################################
 # BEGIN fix (95 / 275) for 'sysctl_net_ipv6_conf_all_accept_ra'
 ###############################################################################
