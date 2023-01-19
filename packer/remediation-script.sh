@@ -1935,254 +1935,254 @@ else
 fi
 # END fix for 'rsyslog_remote_loghost'
 
-###############################################################################
-# BEGIN fix (84 / 275) for 'package_iptables-persistent_installed'
-###############################################################################
-(>&2 echo "Remediating rule 84/275: 'package_iptables-persistent_installed'")
-# Remediation is applicable only in certain platforms
-
-var_firewall_package='iptables'
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ] || [ "$var_firewall_package" == "iptables" ]; then
-
-DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables-persistent"
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'package_iptables-persistent_installed'
-
-###############################################################################
-# BEGIN fix (85 / 275) for 'package_iptables_installed'
-###############################################################################
-(>&2 echo "Remediating rule 85/275: 'package_iptables_installed'")
-# Remediation is applicable only in certain platforms
-
-var_firewall_package='iptables'
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ] || [ "$var_firewall_package" == "iptables" ]; then
-
-DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables"
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'package_iptables_installed'
-
-###############################################################################
-# BEGIN fix (86 / 275) for 'package_iptables-persistent_removed'
-###############################################################################
-(>&2 echo "Remediating rule 86/275: 'package_iptables-persistent_removed'")
-# Remediation is applicable only in certain platforms
-
-var_firewall_package='iptables'
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ] || { [ -n "$var_firewall_package" ] && [ "$var_firewall_package" != "iptables" ] ; }; then
-
-# CAUTION: This remediation script will remove iptables-persistent
-#	   from the system, and may remove any packages
-#	   that depend on iptables-persistent. Execute this
-#	   remediation AFTER testing on a non-production
-#	   system!
-
-DEBIAN_FRONTEND=noninteractive apt-get remove -y "iptables-persistent"
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'package_iptables-persistent_removed'
-
-###############################################################################
-# BEGIN fix (87 / 275) for 'ip6tables_allow_in_lo'
-###############################################################################
-(>&2 echo "Remediating rule 87/275: 'ip6tables_allow_in_lo'")
-# Remediation is applicable only in certain platforms
-
-var_firewall_package='iptables'
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ] && { [ "$var_firewall_package" == "iptables" ]; }; then
-
-if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables" 2>/dev/null | grep -q installed; then
-    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables"
-fi
-
-if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables-persistent" 2>/dev/null | grep -q installed; then
-    
-    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v4 boolean true"
-    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v6 boolean true"
-    
-    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables-persistent"
-fi
-
-
-ip6tables -C INPUT -i lo -j ACCEPT 2>/dev/null || ip6tables -A INPUT -i lo -j ACCEPT
-ip6tables-save -t filter > /etc/iptables/rules.v6
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'ip6tables_allow_in_lo'
-
-###############################################################################
-# BEGIN fix (88 / 275) for 'ip6tables_allow_out_lo'
-###############################################################################
-(>&2 echo "Remediating rule 88/275: 'ip6tables_allow_out_lo'")
-# Remediation is applicable only in certain platforms
-
-var_firewall_package='iptables'
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ] && { [ "$var_firewall_package" == "iptables" ]; }; then
-
-if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables" 2>/dev/null | grep -q installed; then
-    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables"
-fi
-
-if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables-persistent" 2>/dev/null | grep -q installed; then
-    
-    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v4 boolean true"
-    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v6 boolean true"
-    
-    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables-persistent"
-fi
-
-
-ip6tables -C OUTPUT -o lo -j ACCEPT 2>/dev/null || ip6tables -A OUTPUT -o lo -j ACCEPT
-ip6tables-save -t filter > /etc/iptables/rules.v6
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'ip6tables_allow_out_lo'
-
-###############################################################################
-# BEGIN fix (89 / 275) for 'ip6tables_deny_in_other_for_localhost6'
-###############################################################################
-(>&2 echo "Remediating rule 89/275: 'ip6tables_deny_in_other_for_localhost6'")
-# Remediation is applicable only in certain platforms
-
-var_firewall_package='iptables'
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ] && { [ "$var_firewall_package" == "iptables" ]; }; then
-
-if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables" 2>/dev/null | grep -q installed; then
-    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables"
-fi
-
-if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables-persistent" 2>/dev/null | grep -q installed; then
-    
-    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v4 boolean true"
-    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v6 boolean true"
-    
-    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables-persistent"
-fi
-
-
-ip6tables -C INPUT -s ::1 -j DROP 2>/dev/null || ip6tables -A INPUT -s ::1 -j DROP
-ip6tables-save -t filter > /etc/iptables/rules.v6
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'ip6tables_deny_in_other_for_localhost6'
-
-###############################################################################
-# BEGIN fix (90 / 275) for 'iptables_allow_in_lo'
-###############################################################################
-(>&2 echo "Remediating rule 90/275: 'iptables_allow_in_lo'")
-# Remediation is applicable only in certain platforms
-
-var_firewall_package='iptables'
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ] && { [ "$var_firewall_package" == "iptables" ]; }; then
-
-if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables" 2>/dev/null | grep -q installed; then
-    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables"
-fi
-
-if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables-persistent" 2>/dev/null | grep -q installed; then
-    
-    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v4 boolean true"
-    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v6 boolean true"
-    
-    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables-persistent"
-fi
-
-
-iptables -C INPUT -i lo -j ACCEPT 2>/dev/null || iptables -A INPUT -i lo -j ACCEPT
-iptables-save -t filter > /etc/iptables/rules.v4
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'iptables_allow_in_lo'
-
-###############################################################################
-# BEGIN fix (91 / 275) for 'iptables_allow_out_lo'
-###############################################################################
-(>&2 echo "Remediating rule 91/275: 'iptables_allow_out_lo'")
-# Remediation is applicable only in certain platforms
-
-var_firewall_package='iptables'
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ] && { [ "$var_firewall_package" == "iptables" ]; }; then
-
-if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables" 2>/dev/null | grep -q installed; then
-    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables"
-fi
-
-if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables-persistent" 2>/dev/null | grep -q installed; then
-    
-    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v4 boolean true"
-    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v6 boolean true"
-    
-    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables-persistent"
-fi
-
-
-iptables -C OUTPUT -o lo -j ACCEPT 2>/dev/null || iptables -A OUTPUT -o lo -j ACCEPT
-iptables-save -t filter > /etc/iptables/rules.v4
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'iptables_allow_out_lo'
-
-###############################################################################
-# BEGIN fix (92 / 275) for 'iptables_deny_in_other_for_localhost'
-###############################################################################
-(>&2 echo "Remediating rule 92/275: 'iptables_deny_in_other_for_localhost'")
-# Remediation is applicable only in certain platforms
-
-var_firewall_package='iptables'
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ] && { [ "$var_firewall_package" == "iptables" ]; }; then
-
-if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables" 2>/dev/null | grep -q installed; then
-    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables"
-fi
-
-if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables-persistent" 2>/dev/null | grep -q installed; then
-    
-    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v4 boolean true"
-    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v6 boolean true"
-    
-    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables-persistent"
-fi
-
-
-iptables -C INPUT -s 127.0.0.0/8 -j DROP 2>/dev/null || iptables -A INPUT -s 127.0.0.0/8 -j DROP
-iptables-save -t filter > /etc/iptables/rules.v4
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'iptables_deny_in_other_for_localhost'
-
-###############################################################################
-# BEGIN fix (93 / 275) for 'ip6tables_default_deny'
-###############################################################################
-(>&2 echo "Remediating rule 93/275: 'ip6tables_default_deny'")
-# FIX FOR THIS RULE IS MISSING
-# END fix for 'ip6tables_default_deny'
-
-###############################################################################
-# BEGIN fix (94 / 275) for 'iptables_default_deny'
-###############################################################################
-(>&2 echo "Remediating rule 94/275: 'iptables_default_deny'")
-# FIX FOR THIS RULE IS MISSING
-# END fix for 'iptables_default_deny'
-
+################################################################################
+## BEGIN fix (84 / 275) for 'package_iptables-persistent_installed'
+################################################################################
+#(>&2 echo "Remediating rule 84/275: 'package_iptables-persistent_installed'")
+## Remediation is applicable only in certain platforms
+#
+#var_firewall_package='iptables'
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ] || [ "$var_firewall_package" == "iptables" ]; then
+#
+#DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables-persistent"
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'package_iptables-persistent_installed'
+#
+################################################################################
+## BEGIN fix (85 / 275) for 'package_iptables_installed'
+################################################################################
+#(>&2 echo "Remediating rule 85/275: 'package_iptables_installed'")
+## Remediation is applicable only in certain platforms
+#
+#var_firewall_package='iptables'
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ] || [ "$var_firewall_package" == "iptables" ]; then
+#
+#DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables"
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'package_iptables_installed'
+#
+################################################################################
+## BEGIN fix (86 / 275) for 'package_iptables-persistent_removed'
+################################################################################
+#(>&2 echo "Remediating rule 86/275: 'package_iptables-persistent_removed'")
+## Remediation is applicable only in certain platforms
+#
+#var_firewall_package='iptables'
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ] || { [ -n "$var_firewall_package" ] && [ "$var_firewall_package" != "iptables" ] ; }; then
+#
+## CAUTION: This remediation script will remove iptables-persistent
+##	   from the system, and may remove any packages
+##	   that depend on iptables-persistent. Execute this
+##	   remediation AFTER testing on a non-production
+##	   system!
+#
+#DEBIAN_FRONTEND=noninteractive apt-get remove -y "iptables-persistent"
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'package_iptables-persistent_removed'
+#
+################################################################################
+## BEGIN fix (87 / 275) for 'ip6tables_allow_in_lo'
+################################################################################
+#(>&2 echo "Remediating rule 87/275: 'ip6tables_allow_in_lo'")
+## Remediation is applicable only in certain platforms
+#
+#var_firewall_package='iptables'
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ] && { [ "$var_firewall_package" == "iptables" ]; }; then
+#
+#if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables" 2>/dev/null | grep -q installed; then
+#    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables"
+#fi
+#
+#if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables-persistent" 2>/dev/null | grep -q installed; then
+#    
+#    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v4 boolean true"
+#    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v6 boolean true"
+#    
+#    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables-persistent"
+#fi
+#
+#
+#ip6tables -C INPUT -i lo -j ACCEPT 2>/dev/null || ip6tables -A INPUT -i lo -j ACCEPT
+#ip6tables-save -t filter > /etc/iptables/rules.v6
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'ip6tables_allow_in_lo'
+#
+################################################################################
+## BEGIN fix (88 / 275) for 'ip6tables_allow_out_lo'
+################################################################################
+#(>&2 echo "Remediating rule 88/275: 'ip6tables_allow_out_lo'")
+## Remediation is applicable only in certain platforms
+#
+#var_firewall_package='iptables'
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ] && { [ "$var_firewall_package" == "iptables" ]; }; then
+#
+#if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables" 2>/dev/null | grep -q installed; then
+#    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables"
+#fi
+#
+#if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables-persistent" 2>/dev/null | grep -q installed; then
+#    
+#    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v4 boolean true"
+#    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v6 boolean true"
+#    
+#    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables-persistent"
+#fi
+#
+#
+#ip6tables -C OUTPUT -o lo -j ACCEPT 2>/dev/null || ip6tables -A OUTPUT -o lo -j ACCEPT
+#ip6tables-save -t filter > /etc/iptables/rules.v6
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'ip6tables_allow_out_lo'
+#
+################################################################################
+## BEGIN fix (89 / 275) for 'ip6tables_deny_in_other_for_localhost6'
+################################################################################
+#(>&2 echo "Remediating rule 89/275: 'ip6tables_deny_in_other_for_localhost6'")
+## Remediation is applicable only in certain platforms
+#
+#var_firewall_package='iptables'
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ] && { [ "$var_firewall_package" == "iptables" ]; }; then
+#
+#if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables" 2>/dev/null | grep -q installed; then
+#    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables"
+#fi
+#
+#if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables-persistent" 2>/dev/null | grep -q installed; then
+#    
+#    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v4 boolean true"
+#    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v6 boolean true"
+#    
+#    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables-persistent"
+#fi
+#
+#
+#ip6tables -C INPUT -s ::1 -j DROP 2>/dev/null || ip6tables -A INPUT -s ::1 -j DROP
+#ip6tables-save -t filter > /etc/iptables/rules.v6
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'ip6tables_deny_in_other_for_localhost6'
+#
+################################################################################
+## BEGIN fix (90 / 275) for 'iptables_allow_in_lo'
+################################################################################
+#(>&2 echo "Remediating rule 90/275: 'iptables_allow_in_lo'")
+## Remediation is applicable only in certain platforms
+#
+#var_firewall_package='iptables'
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ] && { [ "$var_firewall_package" == "iptables" ]; }; then
+#
+#if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables" 2>/dev/null | grep -q installed; then
+#    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables"
+#fi
+#
+#if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables-persistent" 2>/dev/null | grep -q installed; then
+#    
+#    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v4 boolean true"
+#    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v6 boolean true"
+#    
+#    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables-persistent"
+#fi
+#
+#
+#iptables -C INPUT -i lo -j ACCEPT 2>/dev/null || iptables -A INPUT -i lo -j ACCEPT
+#iptables-save -t filter > /etc/iptables/rules.v4
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'iptables_allow_in_lo'
+#
+################################################################################
+## BEGIN fix (91 / 275) for 'iptables_allow_out_lo'
+################################################################################
+#(>&2 echo "Remediating rule 91/275: 'iptables_allow_out_lo'")
+## Remediation is applicable only in certain platforms
+#
+#var_firewall_package='iptables'
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ] && { [ "$var_firewall_package" == "iptables" ]; }; then
+#
+#if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables" 2>/dev/null | grep -q installed; then
+#    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables"
+#fi
+#
+#if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables-persistent" 2>/dev/null | grep -q installed; then
+#    
+#    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v4 boolean true"
+#    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v6 boolean true"
+#    
+#    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables-persistent"
+#fi
+#
+#
+#iptables -C OUTPUT -o lo -j ACCEPT 2>/dev/null || iptables -A OUTPUT -o lo -j ACCEPT
+#iptables-save -t filter > /etc/iptables/rules.v4
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'iptables_allow_out_lo'
+#
+################################################################################
+## BEGIN fix (92 / 275) for 'iptables_deny_in_other_for_localhost'
+################################################################################
+#(>&2 echo "Remediating rule 92/275: 'iptables_deny_in_other_for_localhost'")
+## Remediation is applicable only in certain platforms
+#
+#var_firewall_package='iptables'
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ] && { [ "$var_firewall_package" == "iptables" ]; }; then
+#
+#if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables" 2>/dev/null | grep -q installed; then
+#    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables"
+#fi
+#
+#if ! dpkg-query --show --showformat='${db:Status-Status}\n' "iptables-persistent" 2>/dev/null | grep -q installed; then
+#    
+#    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v4 boolean true"
+#    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v6 boolean true"
+#    
+#    DEBIAN_FRONTEND=noninteractive apt-get install -y "iptables-persistent"
+#fi
+#
+#
+#iptables -C INPUT -s 127.0.0.0/8 -j DROP 2>/dev/null || iptables -A INPUT -s 127.0.0.0/8 -j DROP
+#iptables-save -t filter > /etc/iptables/rules.v4
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'iptables_deny_in_other_for_localhost'
+#
+################################################################################
+## BEGIN fix (93 / 275) for 'ip6tables_default_deny'
+################################################################################
+#(>&2 echo "Remediating rule 93/275: 'ip6tables_default_deny'")
+## FIX FOR THIS RULE IS MISSING
+## END fix for 'ip6tables_default_deny'
+#
+################################################################################
+## BEGIN fix (94 / 275) for 'iptables_default_deny'
+################################################################################
+#(>&2 echo "Remediating rule 94/275: 'iptables_default_deny'")
+## FIX FOR THIS RULE IS MISSING
+## END fix for 'iptables_default_deny'
+#
 ###############################################################################
 # BEGIN fix (95 / 275) for 'sysctl_net_ipv6_conf_all_accept_ra'
 ###############################################################################
@@ -6316,903 +6316,903 @@ DEBIAN_FRONTEND=noninteractive apt-get remove -y "samba"
 DEBIAN_FRONTEND=noninteractive apt-get remove -y "snmp"
 # END fix for 'package_net-snmp_removed'
 
-###############################################################################
-# BEGIN fix (249 / 275) for 'file_groupowner_sshd_config'
-###############################################################################
-(>&2 echo "Remediating rule 249/275: 'file_groupowner_sshd_config'")
-# Remediation is applicable only in certain platforms
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
-
-chgrp 0 /etc/ssh/sshd_config
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'file_groupowner_sshd_config'
-
-###############################################################################
-# BEGIN fix (250 / 275) for 'file_owner_sshd_config'
-###############################################################################
-(>&2 echo "Remediating rule 250/275: 'file_owner_sshd_config'")
-# Remediation is applicable only in certain platforms
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
-
-chown 0 /etc/ssh/sshd_config
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'file_owner_sshd_config'
-
-###############################################################################
-# BEGIN fix (251 / 275) for 'file_permissions_sshd_config'
-###############################################################################
-(>&2 echo "Remediating rule 251/275: 'file_permissions_sshd_config'")
-# Remediation is applicable only in certain platforms
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
-
-chmod 0600 /etc/ssh/sshd_config
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'file_permissions_sshd_config'
-
-###############################################################################
-# BEGIN fix (252 / 275) for 'file_permissions_sshd_private_key'
-###############################################################################
-(>&2 echo "Remediating rule 252/275: 'file_permissions_sshd_private_key'")
-# Remediation is applicable only in certain platforms
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
-
-readarray -t files < <(find /etc/ssh/)
-for file in "${files[@]}"; do
-    if basename $file | grep -qE '^.*_key$'; then
-        chmod 0600 $file
-    fi    
-done
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'file_permissions_sshd_private_key'
-
-###############################################################################
-# BEGIN fix (253 / 275) for 'file_permissions_sshd_pub_key'
-###############################################################################
-(>&2 echo "Remediating rule 253/275: 'file_permissions_sshd_pub_key'")
-# Remediation is applicable only in certain platforms
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
-
-readarray -t files < <(find /etc/ssh/)
-for file in "${files[@]}"; do
-    if basename $file | grep -qE '^.*.pub$'; then
-        chmod 0644 $file
-    fi    
-done
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'file_permissions_sshd_pub_key'
-
-###############################################################################
-# BEGIN fix (254 / 275) for 'disable_host_auth'
-###############################################################################
-(>&2 echo "Remediating rule 254/275: 'disable_host_auth'")
-# Remediation is applicable only in certain platforms
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
-
-if [ -e "/etc/ssh/sshd_config" ] ; then
-    
-    LC_ALL=C sed -i "/^\s*HostbasedAuthentication\s\+/Id" "/etc/ssh/sshd_config"
-else
-    touch "/etc/ssh/sshd_config"
-fi
-cp "/etc/ssh/sshd_config" "/etc/ssh/sshd_config.bak"
-# Insert before the line matching the regex '^Match'.
-line_number="$(LC_ALL=C grep -n "^Match" "/etc/ssh/sshd_config.bak" | LC_ALL=C sed 's/:.*//g')"
-if [ -z "$line_number" ]; then
-    # There was no match of '^Match', insert at
-    # the end of the file.
-    printf '%s\n' "HostbasedAuthentication no" >> "/etc/ssh/sshd_config"
-else
-    head -n "$(( line_number - 1 ))" "/etc/ssh/sshd_config.bak" > "/etc/ssh/sshd_config"
-    printf '%s\n' "HostbasedAuthentication no" >> "/etc/ssh/sshd_config"
-    tail -n "+$(( line_number ))" "/etc/ssh/sshd_config.bak" >> "/etc/ssh/sshd_config"
-fi
-# Clean up after ourselves.
-rm "/etc/ssh/sshd_config.bak"
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'disable_host_auth'
-
-###############################################################################
-# BEGIN fix (255 / 275) for 'sshd_disable_empty_passwords'
-###############################################################################
-(>&2 echo "Remediating rule 255/275: 'sshd_disable_empty_passwords'")
-# Remediation is applicable only in certain platforms
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
-
-if [ -e "/etc/ssh/sshd_config" ] ; then
-    
-    LC_ALL=C sed -i "/^\s*PermitEmptyPasswords\s\+/Id" "/etc/ssh/sshd_config"
-else
-    touch "/etc/ssh/sshd_config"
-fi
-cp "/etc/ssh/sshd_config" "/etc/ssh/sshd_config.bak"
-# Insert before the line matching the regex '^Match'.
-line_number="$(LC_ALL=C grep -n "^Match" "/etc/ssh/sshd_config.bak" | LC_ALL=C sed 's/:.*//g')"
-if [ -z "$line_number" ]; then
-    # There was no match of '^Match', insert at
-    # the end of the file.
-    printf '%s\n' "PermitEmptyPasswords no" >> "/etc/ssh/sshd_config"
-else
-    head -n "$(( line_number - 1 ))" "/etc/ssh/sshd_config.bak" > "/etc/ssh/sshd_config"
-    printf '%s\n' "PermitEmptyPasswords no" >> "/etc/ssh/sshd_config"
-    tail -n "+$(( line_number ))" "/etc/ssh/sshd_config.bak" >> "/etc/ssh/sshd_config"
-fi
-# Clean up after ourselves.
-rm "/etc/ssh/sshd_config.bak"
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'sshd_disable_empty_passwords'
-
-###############################################################################
-# BEGIN fix (256 / 275) for 'sshd_disable_rhosts'
-###############################################################################
-(>&2 echo "Remediating rule 256/275: 'sshd_disable_rhosts'")
-# Remediation is applicable only in certain platforms
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
-
-if [ -e "/etc/ssh/sshd_config" ] ; then
-    
-    LC_ALL=C sed -i "/^\s*IgnoreRhosts\s\+/Id" "/etc/ssh/sshd_config"
-else
-    touch "/etc/ssh/sshd_config"
-fi
-cp "/etc/ssh/sshd_config" "/etc/ssh/sshd_config.bak"
-# Insert before the line matching the regex '^Match'.
-line_number="$(LC_ALL=C grep -n "^Match" "/etc/ssh/sshd_config.bak" | LC_ALL=C sed 's/:.*//g')"
-if [ -z "$line_number" ]; then
-    # There was no match of '^Match', insert at
-    # the end of the file.
-    printf '%s\n' "IgnoreRhosts yes" >> "/etc/ssh/sshd_config"
-else
-    head -n "$(( line_number - 1 ))" "/etc/ssh/sshd_config.bak" > "/etc/ssh/sshd_config"
-    printf '%s\n' "IgnoreRhosts yes" >> "/etc/ssh/sshd_config"
-    tail -n "+$(( line_number ))" "/etc/ssh/sshd_config.bak" >> "/etc/ssh/sshd_config"
-fi
-# Clean up after ourselves.
-rm "/etc/ssh/sshd_config.bak"
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'sshd_disable_rhosts'
-
-###############################################################################
-# BEGIN fix (257 / 275) for 'sshd_disable_root_login'
-###############################################################################
-(>&2 echo "Remediating rule 257/275: 'sshd_disable_root_login'")
-# Remediation is applicable only in certain platforms
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
-
-if [ -e "/etc/ssh/sshd_config" ] ; then
-    
-    LC_ALL=C sed -i "/^\s*PermitRootLogin\s\+/Id" "/etc/ssh/sshd_config"
-else
-    touch "/etc/ssh/sshd_config"
-fi
-cp "/etc/ssh/sshd_config" "/etc/ssh/sshd_config.bak"
-# Insert before the line matching the regex '^Match'.
-line_number="$(LC_ALL=C grep -n "^Match" "/etc/ssh/sshd_config.bak" | LC_ALL=C sed 's/:.*//g')"
-if [ -z "$line_number" ]; then
-    # There was no match of '^Match', insert at
-    # the end of the file.
-    printf '%s\n' "PermitRootLogin no" >> "/etc/ssh/sshd_config"
-else
-    head -n "$(( line_number - 1 ))" "/etc/ssh/sshd_config.bak" > "/etc/ssh/sshd_config"
-    printf '%s\n' "PermitRootLogin no" >> "/etc/ssh/sshd_config"
-    tail -n "+$(( line_number ))" "/etc/ssh/sshd_config.bak" >> "/etc/ssh/sshd_config"
-fi
-# Clean up after ourselves.
-rm "/etc/ssh/sshd_config.bak"
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'sshd_disable_root_login'
-
-###############################################################################
-# BEGIN fix (258 / 275) for 'sshd_do_not_permit_user_env'
-###############################################################################
-(>&2 echo "Remediating rule 258/275: 'sshd_do_not_permit_user_env'")
-# Remediation is applicable only in certain platforms
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
-
-if [ -e "/etc/ssh/sshd_config" ] ; then
-    
-    LC_ALL=C sed -i "/^\s*PermitUserEnvironment\s\+/Id" "/etc/ssh/sshd_config"
-else
-    touch "/etc/ssh/sshd_config"
-fi
-cp "/etc/ssh/sshd_config" "/etc/ssh/sshd_config.bak"
-# Insert before the line matching the regex '^Match'.
-line_number="$(LC_ALL=C grep -n "^Match" "/etc/ssh/sshd_config.bak" | LC_ALL=C sed 's/:.*//g')"
-if [ -z "$line_number" ]; then
-    # There was no match of '^Match', insert at
-    # the end of the file.
-    printf '%s\n' "PermitUserEnvironment no" >> "/etc/ssh/sshd_config"
-else
-    head -n "$(( line_number - 1 ))" "/etc/ssh/sshd_config.bak" > "/etc/ssh/sshd_config"
-    printf '%s\n' "PermitUserEnvironment no" >> "/etc/ssh/sshd_config"
-    tail -n "+$(( line_number ))" "/etc/ssh/sshd_config.bak" >> "/etc/ssh/sshd_config"
-fi
-# Clean up after ourselves.
-rm "/etc/ssh/sshd_config.bak"
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'sshd_do_not_permit_user_env'
-
-###############################################################################
-# BEGIN fix (259 / 275) for 'sshd_enable_pam'
-###############################################################################
-(>&2 echo "Remediating rule 259/275: 'sshd_enable_pam'")
-# Remediation is applicable only in certain platforms
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
-
-if [ -e "/etc/ssh/sshd_config" ] ; then
-    
-    LC_ALL=C sed -i "/^\s*UsePAM\s\+/Id" "/etc/ssh/sshd_config"
-else
-    touch "/etc/ssh/sshd_config"
-fi
-cp "/etc/ssh/sshd_config" "/etc/ssh/sshd_config.bak"
-# Insert before the line matching the regex '^Match'.
-line_number="$(LC_ALL=C grep -n "^Match" "/etc/ssh/sshd_config.bak" | LC_ALL=C sed 's/:.*//g')"
-if [ -z "$line_number" ]; then
-    # There was no match of '^Match', insert at
-    # the end of the file.
-    printf '%s\n' "UsePAM yes" >> "/etc/ssh/sshd_config"
-else
-    head -n "$(( line_number - 1 ))" "/etc/ssh/sshd_config.bak" > "/etc/ssh/sshd_config"
-    printf '%s\n' "UsePAM yes" >> "/etc/ssh/sshd_config"
-    tail -n "+$(( line_number ))" "/etc/ssh/sshd_config.bak" >> "/etc/ssh/sshd_config"
-fi
-# Clean up after ourselves.
-rm "/etc/ssh/sshd_config.bak"
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'sshd_enable_pam'
-
-###############################################################################
-# BEGIN fix (260 / 275) for 'sshd_enable_warning_banner_net'
-###############################################################################
-(>&2 echo "Remediating rule 260/275: 'sshd_enable_warning_banner_net'")
-# Remediation is applicable only in certain platforms
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
-
-if [ -e "/etc/ssh/sshd_config" ] ; then
-    
-    LC_ALL=C sed -i "/^\s*Banner\s\+/Id" "/etc/ssh/sshd_config"
-else
-    touch "/etc/ssh/sshd_config"
-fi
-cp "/etc/ssh/sshd_config" "/etc/ssh/sshd_config.bak"
-# Insert before the line matching the regex '^Match'.
-line_number="$(LC_ALL=C grep -n "^Match" "/etc/ssh/sshd_config.bak" | LC_ALL=C sed 's/:.*//g')"
-if [ -z "$line_number" ]; then
-    # There was no match of '^Match', insert at
-    # the end of the file.
-    printf '%s\n' "Banner /etc/issue.net" >> "/etc/ssh/sshd_config"
-else
-    head -n "$(( line_number - 1 ))" "/etc/ssh/sshd_config.bak" > "/etc/ssh/sshd_config"
-    printf '%s\n' "Banner /etc/issue.net" >> "/etc/ssh/sshd_config"
-    tail -n "+$(( line_number ))" "/etc/ssh/sshd_config.bak" >> "/etc/ssh/sshd_config"
-fi
-# Clean up after ourselves.
-rm "/etc/ssh/sshd_config.bak"
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'sshd_enable_warning_banner_net'
-
-###############################################################################
-# BEGIN fix (261 / 275) for 'sshd_set_idle_timeout'
-###############################################################################
-(>&2 echo "Remediating rule 261/275: 'sshd_set_idle_timeout'")
-# Remediation is applicable only in certain platforms
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
-
-
-sshd_idle_timeout_value='300'
-
-
-
-if [ -e "/etc/ssh/sshd_config" ] ; then
-    
-    LC_ALL=C sed -i "/^\s*ClientAliveInterval\s\+/Id" "/etc/ssh/sshd_config"
-else
-    touch "/etc/ssh/sshd_config"
-fi
-cp "/etc/ssh/sshd_config" "/etc/ssh/sshd_config.bak"
-# Insert before the line matching the regex '^Match'.
-line_number="$(LC_ALL=C grep -n "^Match" "/etc/ssh/sshd_config.bak" | LC_ALL=C sed 's/:.*//g')"
-if [ -z "$line_number" ]; then
-    # There was no match of '^Match', insert at
-    # the end of the file.
-    printf '%s\n' "ClientAliveInterval $sshd_idle_timeout_value" >> "/etc/ssh/sshd_config"
-else
-    head -n "$(( line_number - 1 ))" "/etc/ssh/sshd_config.bak" > "/etc/ssh/sshd_config"
-    printf '%s\n' "ClientAliveInterval $sshd_idle_timeout_value" >> "/etc/ssh/sshd_config"
-    tail -n "+$(( line_number ))" "/etc/ssh/sshd_config.bak" >> "/etc/ssh/sshd_config"
-fi
-# Clean up after ourselves.
-rm "/etc/ssh/sshd_config.bak"
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'sshd_set_idle_timeout'
-
-###############################################################################
-# BEGIN fix (262 / 275) for 'sshd_set_keepalive'
-###############################################################################
-(>&2 echo "Remediating rule 262/275: 'sshd_set_keepalive'")
-# Remediation is applicable only in certain platforms
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
-
-
-var_sshd_set_keepalive='3'
-
-
-
-if [ -e "/etc/ssh/sshd_config" ] ; then
-    
-    LC_ALL=C sed -i "/^\s*ClientAliveCountMax\s\+/Id" "/etc/ssh/sshd_config"
-else
-    touch "/etc/ssh/sshd_config"
-fi
-cp "/etc/ssh/sshd_config" "/etc/ssh/sshd_config.bak"
-# Insert before the line matching the regex '^Match'.
-line_number="$(LC_ALL=C grep -n "^Match" "/etc/ssh/sshd_config.bak" | LC_ALL=C sed 's/:.*//g')"
-if [ -z "$line_number" ]; then
-    # There was no match of '^Match', insert at
-    # the end of the file.
-    printf '%s\n' "ClientAliveCountMax $var_sshd_set_keepalive" >> "/etc/ssh/sshd_config"
-else
-    head -n "$(( line_number - 1 ))" "/etc/ssh/sshd_config.bak" > "/etc/ssh/sshd_config"
-    printf '%s\n' "ClientAliveCountMax $var_sshd_set_keepalive" >> "/etc/ssh/sshd_config"
-    tail -n "+$(( line_number ))" "/etc/ssh/sshd_config.bak" >> "/etc/ssh/sshd_config"
-fi
-# Clean up after ourselves.
-rm "/etc/ssh/sshd_config.bak"
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'sshd_set_keepalive'
-
-###############################################################################
-# BEGIN fix (263 / 275) for 'sshd_set_login_grace_time'
-###############################################################################
-(>&2 echo "Remediating rule 263/275: 'sshd_set_login_grace_time'")
-# Remediation is applicable only in certain platforms
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
-
-
-var_sshd_login_grace_time='60'
-
-
-
-if [ -e "/etc/ssh/sshd_config" ] ; then
-    
-    LC_ALL=C sed -i "/^\s*LoginGraceTime\s\+/Id" "/etc/ssh/sshd_config"
-else
-    touch "/etc/ssh/sshd_config"
-fi
-cp "/etc/ssh/sshd_config" "/etc/ssh/sshd_config.bak"
-# Insert before the line matching the regex '^Match'.
-line_number="$(LC_ALL=C grep -n "^Match" "/etc/ssh/sshd_config.bak" | LC_ALL=C sed 's/:.*//g')"
-if [ -z "$line_number" ]; then
-    # There was no match of '^Match', insert at
-    # the end of the file.
-    printf '%s\n' "LoginGraceTime $var_sshd_login_grace_time" >> "/etc/ssh/sshd_config"
-else
-    head -n "$(( line_number - 1 ))" "/etc/ssh/sshd_config.bak" > "/etc/ssh/sshd_config"
-    printf '%s\n' "LoginGraceTime $var_sshd_login_grace_time" >> "/etc/ssh/sshd_config"
-    tail -n "+$(( line_number ))" "/etc/ssh/sshd_config.bak" >> "/etc/ssh/sshd_config"
-fi
-# Clean up after ourselves.
-rm "/etc/ssh/sshd_config.bak"
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'sshd_set_login_grace_time'
-
-###############################################################################
-# BEGIN fix (264 / 275) for 'sshd_set_loglevel_info_or_verbose'
-###############################################################################
-(>&2 echo "Remediating rule 264/275: 'sshd_set_loglevel_info_or_verbose'")
-# Remediation is applicable only in certain platforms
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
-
-#!/bin/bash
-
-
-var_sshd_set_loglevel='INFO'
-
-
-
-if [ -e "/etc/ssh/sshd_config" ] ; then
-    
-    LC_ALL=C sed -i "/^\s*LogLevel\s\+/Id" "/etc/ssh/sshd_config"
-else
-    touch "/etc/ssh/sshd_config"
-fi
-cp "/etc/ssh/sshd_config" "/etc/ssh/sshd_config.bak"
-# Insert before the line matching the regex '^Match'.
-line_number="$(LC_ALL=C grep -n "^Match" "/etc/ssh/sshd_config.bak" | LC_ALL=C sed 's/:.*//g')"
-if [ -z "$line_number" ]; then
-    # There was no match of '^Match', insert at
-    # the end of the file.
-    printf '%s\n' "LogLevel $var_sshd_set_loglevel" >> "/etc/ssh/sshd_config"
-else
-    head -n "$(( line_number - 1 ))" "/etc/ssh/sshd_config.bak" > "/etc/ssh/sshd_config"
-    printf '%s\n' "LogLevel $var_sshd_set_loglevel" >> "/etc/ssh/sshd_config"
-    tail -n "+$(( line_number ))" "/etc/ssh/sshd_config.bak" >> "/etc/ssh/sshd_config"
-fi
-# Clean up after ourselves.
-rm "/etc/ssh/sshd_config.bak"
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'sshd_set_loglevel_info_or_verbose'
-
-###############################################################################
-# BEGIN fix (265 / 275) for 'sshd_set_max_auth_tries'
-###############################################################################
-(>&2 echo "Remediating rule 265/275: 'sshd_set_max_auth_tries'")
-# Remediation is applicable only in certain platforms
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
-
-
-sshd_max_auth_tries_value='4'
-
-
-
-if [ -e "/etc/ssh/sshd_config" ] ; then
-    
-    LC_ALL=C sed -i "/^\s*MaxAuthTries\s\+/Id" "/etc/ssh/sshd_config"
-else
-    touch "/etc/ssh/sshd_config"
-fi
-cp "/etc/ssh/sshd_config" "/etc/ssh/sshd_config.bak"
-# Insert before the line matching the regex '^Match'.
-line_number="$(LC_ALL=C grep -n "^Match" "/etc/ssh/sshd_config.bak" | LC_ALL=C sed 's/:.*//g')"
-if [ -z "$line_number" ]; then
-    # There was no match of '^Match', insert at
-    # the end of the file.
-    printf '%s\n' "MaxAuthTries $sshd_max_auth_tries_value" >> "/etc/ssh/sshd_config"
-else
-    head -n "$(( line_number - 1 ))" "/etc/ssh/sshd_config.bak" > "/etc/ssh/sshd_config"
-    printf '%s\n' "MaxAuthTries $sshd_max_auth_tries_value" >> "/etc/ssh/sshd_config"
-    tail -n "+$(( line_number ))" "/etc/ssh/sshd_config.bak" >> "/etc/ssh/sshd_config"
-fi
-# Clean up after ourselves.
-rm "/etc/ssh/sshd_config.bak"
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'sshd_set_max_auth_tries'
-
-###############################################################################
-# BEGIN fix (266 / 275) for 'sshd_set_max_sessions'
-###############################################################################
-(>&2 echo "Remediating rule 266/275: 'sshd_set_max_sessions'")
-# Remediation is applicable only in certain platforms
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
-
-
-var_sshd_max_sessions='10'
-
-
-
-if [ -e "/etc/ssh/sshd_config" ] ; then
-    
-    LC_ALL=C sed -i "/^\s*MaxSessions\s\+/Id" "/etc/ssh/sshd_config"
-else
-    touch "/etc/ssh/sshd_config"
-fi
-cp "/etc/ssh/sshd_config" "/etc/ssh/sshd_config.bak"
-# Insert before the line matching the regex '^Match'.
-line_number="$(LC_ALL=C grep -n "^Match" "/etc/ssh/sshd_config.bak" | LC_ALL=C sed 's/:.*//g')"
-if [ -z "$line_number" ]; then
-    # There was no match of '^Match', insert at
-    # the end of the file.
-    printf '%s\n' "MaxSessions $var_sshd_max_sessions" >> "/etc/ssh/sshd_config"
-else
-    head -n "$(( line_number - 1 ))" "/etc/ssh/sshd_config.bak" > "/etc/ssh/sshd_config"
-    printf '%s\n' "MaxSessions $var_sshd_max_sessions" >> "/etc/ssh/sshd_config"
-    tail -n "+$(( line_number ))" "/etc/ssh/sshd_config.bak" >> "/etc/ssh/sshd_config"
-fi
-# Clean up after ourselves.
-rm "/etc/ssh/sshd_config.bak"
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'sshd_set_max_sessions'
-
-###############################################################################
-# BEGIN fix (267 / 275) for 'sshd_set_maxstartups'
-###############################################################################
-(>&2 echo "Remediating rule 267/275: 'sshd_set_maxstartups'")
-# Remediation is applicable only in certain platforms
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
-
-
-var_sshd_set_maxstartups='10:30:100'
-
-
-
-if [ -e "/etc/ssh/sshd_config" ] ; then
-    
-    LC_ALL=C sed -i "/^\s*MaxStartups\s\+/Id" "/etc/ssh/sshd_config"
-else
-    touch "/etc/ssh/sshd_config"
-fi
-cp "/etc/ssh/sshd_config" "/etc/ssh/sshd_config.bak"
-# Insert before the line matching the regex '^Match'.
-line_number="$(LC_ALL=C grep -n "^Match" "/etc/ssh/sshd_config.bak" | LC_ALL=C sed 's/:.*//g')"
-if [ -z "$line_number" ]; then
-    # There was no match of '^Match', insert at
-    # the end of the file.
-    printf '%s\n' "MaxStartups $var_sshd_set_maxstartups" >> "/etc/ssh/sshd_config"
-else
-    head -n "$(( line_number - 1 ))" "/etc/ssh/sshd_config.bak" > "/etc/ssh/sshd_config"
-    printf '%s\n' "MaxStartups $var_sshd_set_maxstartups" >> "/etc/ssh/sshd_config"
-    tail -n "+$(( line_number ))" "/etc/ssh/sshd_config.bak" >> "/etc/ssh/sshd_config"
-fi
-# Clean up after ourselves.
-rm "/etc/ssh/sshd_config.bak"
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'sshd_set_maxstartups'
-
-###############################################################################
-# BEGIN fix (268 / 275) for 'sshd_use_approved_ciphers'
-###############################################################################
-(>&2 echo "Remediating rule 268/275: 'sshd_use_approved_ciphers'")
-# Remediation is applicable only in certain platforms
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
-
-
-sshd_approved_ciphers='aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr'
-
-
-
-# Test if the config_file is a symbolic link. If so, use --follow-symlinks with sed.
-# Otherwise, regular sed command will do.
-sed_command=('sed' '-i')
-if test -L "/etc/ssh/sshd_config"; then
-    sed_command+=('--follow-symlinks')
-fi
-
-# If the cce arg is empty, CCE is not assigned.
-if [ -z "" ]; then
-    cce="CCE"
-else
-    cce=""
-fi
-
-# Strip any search characters in the key arg so that the key can be replaced without
-# adding any search characters to the config file.
-stripped_key=$(sed 's/[\^=\$,;+]*//g' <<< "^Ciphers")
-
-# shellcheck disable=SC2059
-printf -v formatted_output "%s %s" "$stripped_key" "$sshd_approved_ciphers"
-
-# If the key exists, change it. Otherwise, add it to the config_file.
-# We search for the key string followed by a word boundary (matched by \>),
-# so if we search for 'setting', 'setting2' won't match.
-if LC_ALL=C grep -q -m 1 -i -e "^Ciphers\\>" "/etc/ssh/sshd_config"; then
-    "${sed_command[@]}" "s/^Ciphers\\>.*/$formatted_output/gi" "/etc/ssh/sshd_config"
-else
-    # \n is precaution for case where file ends without trailing newline
-    printf '\n# Per %s: Set %s in %s\n' "$cce" "$formatted_output" "/etc/ssh/sshd_config" >> "/etc/ssh/sshd_config"
-    printf '%s\n' "$formatted_output" >> "/etc/ssh/sshd_config"
-fi
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'sshd_use_approved_ciphers'
-
-###############################################################################
-# BEGIN fix (269 / 275) for 'sshd_use_approved_kexs'
-###############################################################################
-(>&2 echo "Remediating rule 269/275: 'sshd_use_approved_kexs'")
-# Remediation is applicable only in certain platforms
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
-
-
-sshd_approved_kexs='ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,diffie-hellman-group14-sha256'
-
-
-
-# Test if the config_file is a symbolic link. If so, use --follow-symlinks with sed.
-# Otherwise, regular sed command will do.
-sed_command=('sed' '-i')
-if test -L "/etc/ssh/sshd_config"; then
-    sed_command+=('--follow-symlinks')
-fi
-
-# If the cce arg is empty, CCE is not assigned.
-if [ -z "" ]; then
-    cce="CCE"
-else
-    cce=""
-fi
-
-# Strip any search characters in the key arg so that the key can be replaced without
-# adding any search characters to the config file.
-stripped_key=$(sed 's/[\^=\$,;+]*//g' <<< "^KexAlgorithms")
-
-# shellcheck disable=SC2059
-printf -v formatted_output "%s %s" "$stripped_key" "$sshd_approved_kexs"
-
-# If the key exists, change it. Otherwise, add it to the config_file.
-# We search for the key string followed by a word boundary (matched by \>),
-# so if we search for 'setting', 'setting2' won't match.
-if LC_ALL=C grep -q -m 1 -i -e "^KexAlgorithms\\>" "/etc/ssh/sshd_config"; then
-    "${sed_command[@]}" "s/^KexAlgorithms\\>.*/$formatted_output/gi" "/etc/ssh/sshd_config"
-else
-    # \n is precaution for case where file ends without trailing newline
-    printf '\n# Per %s: Set %s in %s\n' "$cce" "$formatted_output" "/etc/ssh/sshd_config" >> "/etc/ssh/sshd_config"
-    printf '%s\n' "$formatted_output" >> "/etc/ssh/sshd_config"
-fi
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'sshd_use_approved_kexs'
-
-###############################################################################
-# BEGIN fix (270 / 275) for 'sshd_use_approved_macs'
-###############################################################################
-(>&2 echo "Remediating rule 270/275: 'sshd_use_approved_macs'")
-# Remediation is applicable only in certain platforms
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
-
-
-sshd_approved_macs='hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-256,hmac-sha2-512'
-
-
-
-# Test if the config_file is a symbolic link. If so, use --follow-symlinks with sed.
-# Otherwise, regular sed command will do.
-sed_command=('sed' '-i')
-if test -L "/etc/ssh/sshd_config"; then
-    sed_command+=('--follow-symlinks')
-fi
-
-# If the cce arg is empty, CCE is not assigned.
-if [ -z "" ]; then
-    cce="CCE"
-else
-    cce=""
-fi
-
-# Strip any search characters in the key arg so that the key can be replaced without
-# adding any search characters to the config file.
-stripped_key=$(sed 's/[\^=\$,;+]*//g' <<< "^MACs")
-
-# shellcheck disable=SC2059
-printf -v formatted_output "%s %s" "$stripped_key" "$sshd_approved_macs"
-
-# If the key exists, change it. Otherwise, add it to the config_file.
-# We search for the key string followed by a word boundary (matched by \>),
-# so if we search for 'setting', 'setting2' won't match.
-if LC_ALL=C grep -q -m 1 -i -e "^MACs\\>" "/etc/ssh/sshd_config"; then
-    "${sed_command[@]}" "s/^MACs\\>.*/$formatted_output/gi" "/etc/ssh/sshd_config"
-else
-    # \n is precaution for case where file ends without trailing newline
-    printf '\n# Per %s: Set %s in %s\n' "$cce" "$formatted_output" "/etc/ssh/sshd_config" >> "/etc/ssh/sshd_config"
-    printf '%s\n' "$formatted_output" >> "/etc/ssh/sshd_config"
-fi
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'sshd_use_approved_macs'
-
-###############################################################################
-# BEGIN fix (271 / 275) for 'sshd_configure_allow_groups'
-###############################################################################
-(>&2 echo "Remediating rule 271/275: 'sshd_configure_allow_groups'")
-# Remediation is applicable only in certain platforms
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
-
-
-var_sshd_allow_groups_valid='e39d05b72f25767869d44391919434896bb055772d7969f74472032b03bc18418911f3b0e6dd47ff8f3b2323728225286c3cb36914d28dc7db40bdd786159c0a'
-
-
-
-# We don't add the default magic value to the sshd config file, since it's a security risk.
-default_value="e39d05b72f25767869d44391919434896bb055772d7969f74472032b03bc18418911f3b0e6dd47ff8f3b2323728225286c3cb36914d28dc7db40bdd786159c0a"
-
-if [ "${var_sshd_allow_groups_valid}" != ${default_value} ]; then
-    if [ -e "/etc/ssh/sshd_config" ] ; then
-    
-    LC_ALL=C sed -i "/^\s*AllowGroups\s\+/Id" "/etc/ssh/sshd_config"
-else
-    touch "/etc/ssh/sshd_config"
-fi
-cp "/etc/ssh/sshd_config" "/etc/ssh/sshd_config.bak"
-# Insert before the line matching the regex '^Match'.
-line_number="$(LC_ALL=C grep -n "^Match" "/etc/ssh/sshd_config.bak" | LC_ALL=C sed 's/:.*//g')"
-if [ -z "$line_number" ]; then
-    # There was no match of '^Match', insert at
-    # the end of the file.
-    printf '%s\n' "AllowGroups $var_sshd_allow_groups_valid" >> "/etc/ssh/sshd_config"
-else
-    head -n "$(( line_number - 1 ))" "/etc/ssh/sshd_config.bak" > "/etc/ssh/sshd_config"
-    printf '%s\n' "AllowGroups $var_sshd_allow_groups_valid" >> "/etc/ssh/sshd_config"
-    tail -n "+$(( line_number ))" "/etc/ssh/sshd_config.bak" >> "/etc/ssh/sshd_config"
-fi
-# Clean up after ourselves.
-rm "/etc/ssh/sshd_config.bak"
-fi
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'sshd_configure_allow_groups'
-
-###############################################################################
-# BEGIN fix (272 / 275) for 'sshd_configure_allow_users'
-###############################################################################
-(>&2 echo "Remediating rule 272/275: 'sshd_configure_allow_users'")
-# Remediation is applicable only in certain platforms
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
-
-
-var_sshd_allow_users_valid='e39d05b72f25767869d44391919434896bb055772d7969f74472032b03bc18418911f3b0e6dd47ff8f3b2323728225286c3cb36914d28dc7db40bdd786159c0a'
-
-
-
-# We don't add the default magic value to the sshd config file, since it's a security risk.
-default_value="e39d05b72f25767869d44391919434896bb055772d7969f74472032b03bc18418911f3b0e6dd47ff8f3b2323728225286c3cb36914d28dc7db40bdd786159c0a"
-
-if [ "${var_sshd_allow_users_valid}" != ${default_value} ]; then
-    if [ -e "/etc/ssh/sshd_config" ] ; then
-    
-    LC_ALL=C sed -i "/^\s*AllowUsers\s\+/Id" "/etc/ssh/sshd_config"
-else
-    touch "/etc/ssh/sshd_config"
-fi
-cp "/etc/ssh/sshd_config" "/etc/ssh/sshd_config.bak"
-# Insert before the line matching the regex '^Match'.
-line_number="$(LC_ALL=C grep -n "^Match" "/etc/ssh/sshd_config.bak" | LC_ALL=C sed 's/:.*//g')"
-if [ -z "$line_number" ]; then
-    # There was no match of '^Match', insert at
-    # the end of the file.
-    printf '%s\n' "AllowUsers $var_sshd_allow_users_valid" >> "/etc/ssh/sshd_config"
-else
-    head -n "$(( line_number - 1 ))" "/etc/ssh/sshd_config.bak" > "/etc/ssh/sshd_config"
-    printf '%s\n' "AllowUsers $var_sshd_allow_users_valid" >> "/etc/ssh/sshd_config"
-    tail -n "+$(( line_number ))" "/etc/ssh/sshd_config.bak" >> "/etc/ssh/sshd_config"
-fi
-# Clean up after ourselves.
-rm "/etc/ssh/sshd_config.bak"
-fi
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'sshd_configure_allow_users'
-
-###############################################################################
-# BEGIN fix (273 / 275) for 'sshd_configure_deny_groups'
-###############################################################################
-(>&2 echo "Remediating rule 273/275: 'sshd_configure_deny_groups'")
-# Remediation is applicable only in certain platforms
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
-
-
-var_sshd_deny_groups_valid='e39d05b72f25767869d44391919434896bb055772d7969f74472032b03bc18418911f3b0e6dd47ff8f3b2323728225286c3cb36914d28dc7db40bdd786159c0a'
-
-
-
-# We don't add the default magic value to the sshd config file, since it's a security risk.
-default_value="e39d05b72f25767869d44391919434896bb055772d7969f74472032b03bc18418911f3b0e6dd47ff8f3b2323728225286c3cb36914d28dc7db40bdd786159c0a"
-
-if [ "${var_sshd_deny_groups_valid}" != ${default_value} ]; then
-    if [ -e "/etc/ssh/sshd_config" ] ; then
-    
-    LC_ALL=C sed -i "/^\s*DenyGroups\s\+/Id" "/etc/ssh/sshd_config"
-else
-    touch "/etc/ssh/sshd_config"
-fi
-cp "/etc/ssh/sshd_config" "/etc/ssh/sshd_config.bak"
-# Insert before the line matching the regex '^Match'.
-line_number="$(LC_ALL=C grep -n "^Match" "/etc/ssh/sshd_config.bak" | LC_ALL=C sed 's/:.*//g')"
-if [ -z "$line_number" ]; then
-    # There was no match of '^Match', insert at
-    # the end of the file.
-    printf '%s\n' "DenyGroups $var_sshd_deny_groups_valid" >> "/etc/ssh/sshd_config"
-else
-    head -n "$(( line_number - 1 ))" "/etc/ssh/sshd_config.bak" > "/etc/ssh/sshd_config"
-    printf '%s\n' "DenyGroups $var_sshd_deny_groups_valid" >> "/etc/ssh/sshd_config"
-    tail -n "+$(( line_number ))" "/etc/ssh/sshd_config.bak" >> "/etc/ssh/sshd_config"
-fi
-# Clean up after ourselves.
-rm "/etc/ssh/sshd_config.bak"
-fi
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'sshd_configure_deny_groups'
-
-###############################################################################
-# BEGIN fix (274 / 275) for 'sshd_configure_deny_users'
-###############################################################################
-(>&2 echo "Remediating rule 274/275: 'sshd_configure_deny_users'")
-# Remediation is applicable only in certain platforms
-if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
-
-
-var_sshd_deny_users_valid='e39d05b72f25767869d44391919434896bb055772d7969f74472032b03bc18418911f3b0e6dd47ff8f3b2323728225286c3cb36914d28dc7db40bdd786159c0a'
-
-
-
-# We don't add the default magic value to the sshd config file, since it's a security risk.
-default_value="e39d05b72f25767869d44391919434896bb055772d7969f74472032b03bc18418911f3b0e6dd47ff8f3b2323728225286c3cb36914d28dc7db40bdd786159c0a"
-
-if [ "${var_sshd_deny_users_valid}" != ${default_value} ]; then
-    if [ -e "/etc/ssh/sshd_config" ] ; then
-    
-    LC_ALL=C sed -i "/^\s*DenyUsers\s\+/Id" "/etc/ssh/sshd_config"
-else
-    touch "/etc/ssh/sshd_config"
-fi
-cp "/etc/ssh/sshd_config" "/etc/ssh/sshd_config.bak"
-# Insert before the line matching the regex '^Match'.
-line_number="$(LC_ALL=C grep -n "^Match" "/etc/ssh/sshd_config.bak" | LC_ALL=C sed 's/:.*//g')"
-if [ -z "$line_number" ]; then
-    # There was no match of '^Match', insert at
-    # the end of the file.
-    printf '%s\n' "DenyUsers $var_sshd_deny_users_valid" >> "/etc/ssh/sshd_config"
-else
-    head -n "$(( line_number - 1 ))" "/etc/ssh/sshd_config.bak" > "/etc/ssh/sshd_config"
-    printf '%s\n' "DenyUsers $var_sshd_deny_users_valid" >> "/etc/ssh/sshd_config"
-    tail -n "+$(( line_number ))" "/etc/ssh/sshd_config.bak" >> "/etc/ssh/sshd_config"
-fi
-# Clean up after ourselves.
-rm "/etc/ssh/sshd_config.bak"
-fi
-
-else
-    >&2 echo 'Remediation is not applicable, nothing was done'
-fi
-# END fix for 'sshd_configure_deny_users'
+################################################################################
+## BEGIN fix (249 / 275) for 'file_groupowner_sshd_config'
+################################################################################
+#(>&2 echo "Remediating rule 249/275: 'file_groupowner_sshd_config'")
+## Remediation is applicable only in certain platforms
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
+#
+#chgrp 0 /etc/ssh/sshd_config
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'file_groupowner_sshd_config'
+#
+################################################################################
+## BEGIN fix (250 / 275) for 'file_owner_sshd_config'
+################################################################################
+#(>&2 echo "Remediating rule 250/275: 'file_owner_sshd_config'")
+## Remediation is applicable only in certain platforms
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
+#
+#chown 0 /etc/ssh/sshd_config
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'file_owner_sshd_config'
+#
+################################################################################
+## BEGIN fix (251 / 275) for 'file_permissions_sshd_config'
+################################################################################
+#(>&2 echo "Remediating rule 251/275: 'file_permissions_sshd_config'")
+## Remediation is applicable only in certain platforms
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
+#
+#chmod 0600 /etc/ssh/sshd_config
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'file_permissions_sshd_config'
+#
+################################################################################
+## BEGIN fix (252 / 275) for 'file_permissions_sshd_private_key'
+################################################################################
+#(>&2 echo "Remediating rule 252/275: 'file_permissions_sshd_private_key'")
+## Remediation is applicable only in certain platforms
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
+#
+#readarray -t files < <(find /etc/ssh/)
+#for file in "${files[@]}"; do
+#    if basename $file | grep -qE '^.*_key$'; then
+#        chmod 0600 $file
+#    fi    
+#done
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'file_permissions_sshd_private_key'
+#
+################################################################################
+## BEGIN fix (253 / 275) for 'file_permissions_sshd_pub_key'
+################################################################################
+#(>&2 echo "Remediating rule 253/275: 'file_permissions_sshd_pub_key'")
+## Remediation is applicable only in certain platforms
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
+#
+#readarray -t files < <(find /etc/ssh/)
+#for file in "${files[@]}"; do
+#    if basename $file | grep -qE '^.*.pub$'; then
+#        chmod 0644 $file
+#    fi    
+#done
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'file_permissions_sshd_pub_key'
+#
+################################################################################
+## BEGIN fix (254 / 275) for 'disable_host_auth'
+################################################################################
+#(>&2 echo "Remediating rule 254/275: 'disable_host_auth'")
+## Remediation is applicable only in certain platforms
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
+#
+#if [ -e "/etc/ssh/sshd_config" ] ; then
+#    
+#    LC_ALL=C sed -i "/^\s*HostbasedAuthentication\s\+/Id" "/etc/ssh/sshd_config"
+#else
+#    touch "/etc/ssh/sshd_config"
+#fi
+#cp "/etc/ssh/sshd_config" "/etc/ssh/sshd_config.bak"
+## Insert before the line matching the regex '^Match'.
+#line_number="$(LC_ALL=C grep -n "^Match" "/etc/ssh/sshd_config.bak" | LC_ALL=C sed 's/:.*//g')"
+#if [ -z "$line_number" ]; then
+#    # There was no match of '^Match', insert at
+#    # the end of the file.
+#    printf '%s\n' "HostbasedAuthentication no" >> "/etc/ssh/sshd_config"
+#else
+#    head -n "$(( line_number - 1 ))" "/etc/ssh/sshd_config.bak" > "/etc/ssh/sshd_config"
+#    printf '%s\n' "HostbasedAuthentication no" >> "/etc/ssh/sshd_config"
+#    tail -n "+$(( line_number ))" "/etc/ssh/sshd_config.bak" >> "/etc/ssh/sshd_config"
+#fi
+## Clean up after ourselves.
+#rm "/etc/ssh/sshd_config.bak"
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'disable_host_auth'
+#
+################################################################################
+## BEGIN fix (255 / 275) for 'sshd_disable_empty_passwords'
+################################################################################
+#(>&2 echo "Remediating rule 255/275: 'sshd_disable_empty_passwords'")
+## Remediation is applicable only in certain platforms
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
+#
+#if [ -e "/etc/ssh/sshd_config" ] ; then
+#    
+#    LC_ALL=C sed -i "/^\s*PermitEmptyPasswords\s\+/Id" "/etc/ssh/sshd_config"
+#else
+#    touch "/etc/ssh/sshd_config"
+#fi
+#cp "/etc/ssh/sshd_config" "/etc/ssh/sshd_config.bak"
+## Insert before the line matching the regex '^Match'.
+#line_number="$(LC_ALL=C grep -n "^Match" "/etc/ssh/sshd_config.bak" | LC_ALL=C sed 's/:.*//g')"
+#if [ -z "$line_number" ]; then
+#    # There was no match of '^Match', insert at
+#    # the end of the file.
+#    printf '%s\n' "PermitEmptyPasswords no" >> "/etc/ssh/sshd_config"
+#else
+#    head -n "$(( line_number - 1 ))" "/etc/ssh/sshd_config.bak" > "/etc/ssh/sshd_config"
+#    printf '%s\n' "PermitEmptyPasswords no" >> "/etc/ssh/sshd_config"
+#    tail -n "+$(( line_number ))" "/etc/ssh/sshd_config.bak" >> "/etc/ssh/sshd_config"
+#fi
+## Clean up after ourselves.
+#rm "/etc/ssh/sshd_config.bak"
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'sshd_disable_empty_passwords'
+#
+################################################################################
+## BEGIN fix (256 / 275) for 'sshd_disable_rhosts'
+################################################################################
+#(>&2 echo "Remediating rule 256/275: 'sshd_disable_rhosts'")
+## Remediation is applicable only in certain platforms
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
+#
+#if [ -e "/etc/ssh/sshd_config" ] ; then
+#    
+#    LC_ALL=C sed -i "/^\s*IgnoreRhosts\s\+/Id" "/etc/ssh/sshd_config"
+#else
+#    touch "/etc/ssh/sshd_config"
+#fi
+#cp "/etc/ssh/sshd_config" "/etc/ssh/sshd_config.bak"
+## Insert before the line matching the regex '^Match'.
+#line_number="$(LC_ALL=C grep -n "^Match" "/etc/ssh/sshd_config.bak" | LC_ALL=C sed 's/:.*//g')"
+#if [ -z "$line_number" ]; then
+#    # There was no match of '^Match', insert at
+#    # the end of the file.
+#    printf '%s\n' "IgnoreRhosts yes" >> "/etc/ssh/sshd_config"
+#else
+#    head -n "$(( line_number - 1 ))" "/etc/ssh/sshd_config.bak" > "/etc/ssh/sshd_config"
+#    printf '%s\n' "IgnoreRhosts yes" >> "/etc/ssh/sshd_config"
+#    tail -n "+$(( line_number ))" "/etc/ssh/sshd_config.bak" >> "/etc/ssh/sshd_config"
+#fi
+## Clean up after ourselves.
+#rm "/etc/ssh/sshd_config.bak"
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'sshd_disable_rhosts'
+#
+################################################################################
+## BEGIN fix (257 / 275) for 'sshd_disable_root_login'
+################################################################################
+#(>&2 echo "Remediating rule 257/275: 'sshd_disable_root_login'")
+## Remediation is applicable only in certain platforms
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
+#
+#if [ -e "/etc/ssh/sshd_config" ] ; then
+#    
+#    LC_ALL=C sed -i "/^\s*PermitRootLogin\s\+/Id" "/etc/ssh/sshd_config"
+#else
+#    touch "/etc/ssh/sshd_config"
+#fi
+#cp "/etc/ssh/sshd_config" "/etc/ssh/sshd_config.bak"
+## Insert before the line matching the regex '^Match'.
+#line_number="$(LC_ALL=C grep -n "^Match" "/etc/ssh/sshd_config.bak" | LC_ALL=C sed 's/:.*//g')"
+#if [ -z "$line_number" ]; then
+#    # There was no match of '^Match', insert at
+#    # the end of the file.
+#    printf '%s\n' "PermitRootLogin no" >> "/etc/ssh/sshd_config"
+#else
+#    head -n "$(( line_number - 1 ))" "/etc/ssh/sshd_config.bak" > "/etc/ssh/sshd_config"
+#    printf '%s\n' "PermitRootLogin no" >> "/etc/ssh/sshd_config"
+#    tail -n "+$(( line_number ))" "/etc/ssh/sshd_config.bak" >> "/etc/ssh/sshd_config"
+#fi
+## Clean up after ourselves.
+#rm "/etc/ssh/sshd_config.bak"
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'sshd_disable_root_login'
+#
+################################################################################
+## BEGIN fix (258 / 275) for 'sshd_do_not_permit_user_env'
+################################################################################
+#(>&2 echo "Remediating rule 258/275: 'sshd_do_not_permit_user_env'")
+## Remediation is applicable only in certain platforms
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
+#
+#if [ -e "/etc/ssh/sshd_config" ] ; then
+#    
+#    LC_ALL=C sed -i "/^\s*PermitUserEnvironment\s\+/Id" "/etc/ssh/sshd_config"
+#else
+#    touch "/etc/ssh/sshd_config"
+#fi
+#cp "/etc/ssh/sshd_config" "/etc/ssh/sshd_config.bak"
+## Insert before the line matching the regex '^Match'.
+#line_number="$(LC_ALL=C grep -n "^Match" "/etc/ssh/sshd_config.bak" | LC_ALL=C sed 's/:.*//g')"
+#if [ -z "$line_number" ]; then
+#    # There was no match of '^Match', insert at
+#    # the end of the file.
+#    printf '%s\n' "PermitUserEnvironment no" >> "/etc/ssh/sshd_config"
+#else
+#    head -n "$(( line_number - 1 ))" "/etc/ssh/sshd_config.bak" > "/etc/ssh/sshd_config"
+#    printf '%s\n' "PermitUserEnvironment no" >> "/etc/ssh/sshd_config"
+#    tail -n "+$(( line_number ))" "/etc/ssh/sshd_config.bak" >> "/etc/ssh/sshd_config"
+#fi
+## Clean up after ourselves.
+#rm "/etc/ssh/sshd_config.bak"
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'sshd_do_not_permit_user_env'
+#
+################################################################################
+## BEGIN fix (259 / 275) for 'sshd_enable_pam'
+################################################################################
+#(>&2 echo "Remediating rule 259/275: 'sshd_enable_pam'")
+## Remediation is applicable only in certain platforms
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
+#
+#if [ -e "/etc/ssh/sshd_config" ] ; then
+#    
+#    LC_ALL=C sed -i "/^\s*UsePAM\s\+/Id" "/etc/ssh/sshd_config"
+#else
+#    touch "/etc/ssh/sshd_config"
+#fi
+#cp "/etc/ssh/sshd_config" "/etc/ssh/sshd_config.bak"
+## Insert before the line matching the regex '^Match'.
+#line_number="$(LC_ALL=C grep -n "^Match" "/etc/ssh/sshd_config.bak" | LC_ALL=C sed 's/:.*//g')"
+#if [ -z "$line_number" ]; then
+#    # There was no match of '^Match', insert at
+#    # the end of the file.
+#    printf '%s\n' "UsePAM yes" >> "/etc/ssh/sshd_config"
+#else
+#    head -n "$(( line_number - 1 ))" "/etc/ssh/sshd_config.bak" > "/etc/ssh/sshd_config"
+#    printf '%s\n' "UsePAM yes" >> "/etc/ssh/sshd_config"
+#    tail -n "+$(( line_number ))" "/etc/ssh/sshd_config.bak" >> "/etc/ssh/sshd_config"
+#fi
+## Clean up after ourselves.
+#rm "/etc/ssh/sshd_config.bak"
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'sshd_enable_pam'
+#
+################################################################################
+## BEGIN fix (260 / 275) for 'sshd_enable_warning_banner_net'
+################################################################################
+#(>&2 echo "Remediating rule 260/275: 'sshd_enable_warning_banner_net'")
+## Remediation is applicable only in certain platforms
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
+#
+#if [ -e "/etc/ssh/sshd_config" ] ; then
+#    
+#    LC_ALL=C sed -i "/^\s*Banner\s\+/Id" "/etc/ssh/sshd_config"
+#else
+#    touch "/etc/ssh/sshd_config"
+#fi
+#cp "/etc/ssh/sshd_config" "/etc/ssh/sshd_config.bak"
+## Insert before the line matching the regex '^Match'.
+#line_number="$(LC_ALL=C grep -n "^Match" "/etc/ssh/sshd_config.bak" | LC_ALL=C sed 's/:.*//g')"
+#if [ -z "$line_number" ]; then
+#    # There was no match of '^Match', insert at
+#    # the end of the file.
+#    printf '%s\n' "Banner /etc/issue.net" >> "/etc/ssh/sshd_config"
+#else
+#    head -n "$(( line_number - 1 ))" "/etc/ssh/sshd_config.bak" > "/etc/ssh/sshd_config"
+#    printf '%s\n' "Banner /etc/issue.net" >> "/etc/ssh/sshd_config"
+#    tail -n "+$(( line_number ))" "/etc/ssh/sshd_config.bak" >> "/etc/ssh/sshd_config"
+#fi
+## Clean up after ourselves.
+#rm "/etc/ssh/sshd_config.bak"
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'sshd_enable_warning_banner_net'
+#
+################################################################################
+## BEGIN fix (261 / 275) for 'sshd_set_idle_timeout'
+################################################################################
+#(>&2 echo "Remediating rule 261/275: 'sshd_set_idle_timeout'")
+## Remediation is applicable only in certain platforms
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
+#
+#
+#sshd_idle_timeout_value='300'
+#
+#
+#
+#if [ -e "/etc/ssh/sshd_config" ] ; then
+#    
+#    LC_ALL=C sed -i "/^\s*ClientAliveInterval\s\+/Id" "/etc/ssh/sshd_config"
+#else
+#    touch "/etc/ssh/sshd_config"
+#fi
+#cp "/etc/ssh/sshd_config" "/etc/ssh/sshd_config.bak"
+## Insert before the line matching the regex '^Match'.
+#line_number="$(LC_ALL=C grep -n "^Match" "/etc/ssh/sshd_config.bak" | LC_ALL=C sed 's/:.*//g')"
+#if [ -z "$line_number" ]; then
+#    # There was no match of '^Match', insert at
+#    # the end of the file.
+#    printf '%s\n' "ClientAliveInterval $sshd_idle_timeout_value" >> "/etc/ssh/sshd_config"
+#else
+#    head -n "$(( line_number - 1 ))" "/etc/ssh/sshd_config.bak" > "/etc/ssh/sshd_config"
+#    printf '%s\n' "ClientAliveInterval $sshd_idle_timeout_value" >> "/etc/ssh/sshd_config"
+#    tail -n "+$(( line_number ))" "/etc/ssh/sshd_config.bak" >> "/etc/ssh/sshd_config"
+#fi
+## Clean up after ourselves.
+#rm "/etc/ssh/sshd_config.bak"
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'sshd_set_idle_timeout'
+#
+################################################################################
+## BEGIN fix (262 / 275) for 'sshd_set_keepalive'
+################################################################################
+#(>&2 echo "Remediating rule 262/275: 'sshd_set_keepalive'")
+## Remediation is applicable only in certain platforms
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
+#
+#
+#var_sshd_set_keepalive='3'
+#
+#
+#
+#if [ -e "/etc/ssh/sshd_config" ] ; then
+#    
+#    LC_ALL=C sed -i "/^\s*ClientAliveCountMax\s\+/Id" "/etc/ssh/sshd_config"
+#else
+#    touch "/etc/ssh/sshd_config"
+#fi
+#cp "/etc/ssh/sshd_config" "/etc/ssh/sshd_config.bak"
+## Insert before the line matching the regex '^Match'.
+#line_number="$(LC_ALL=C grep -n "^Match" "/etc/ssh/sshd_config.bak" | LC_ALL=C sed 's/:.*//g')"
+#if [ -z "$line_number" ]; then
+#    # There was no match of '^Match', insert at
+#    # the end of the file.
+#    printf '%s\n' "ClientAliveCountMax $var_sshd_set_keepalive" >> "/etc/ssh/sshd_config"
+#else
+#    head -n "$(( line_number - 1 ))" "/etc/ssh/sshd_config.bak" > "/etc/ssh/sshd_config"
+#    printf '%s\n' "ClientAliveCountMax $var_sshd_set_keepalive" >> "/etc/ssh/sshd_config"
+#    tail -n "+$(( line_number ))" "/etc/ssh/sshd_config.bak" >> "/etc/ssh/sshd_config"
+#fi
+## Clean up after ourselves.
+#rm "/etc/ssh/sshd_config.bak"
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'sshd_set_keepalive'
+#
+################################################################################
+## BEGIN fix (263 / 275) for 'sshd_set_login_grace_time'
+################################################################################
+#(>&2 echo "Remediating rule 263/275: 'sshd_set_login_grace_time'")
+## Remediation is applicable only in certain platforms
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
+#
+#
+#var_sshd_login_grace_time='60'
+#
+#
+#
+#if [ -e "/etc/ssh/sshd_config" ] ; then
+#    
+#    LC_ALL=C sed -i "/^\s*LoginGraceTime\s\+/Id" "/etc/ssh/sshd_config"
+#else
+#    touch "/etc/ssh/sshd_config"
+#fi
+#cp "/etc/ssh/sshd_config" "/etc/ssh/sshd_config.bak"
+## Insert before the line matching the regex '^Match'.
+#line_number="$(LC_ALL=C grep -n "^Match" "/etc/ssh/sshd_config.bak" | LC_ALL=C sed 's/:.*//g')"
+#if [ -z "$line_number" ]; then
+#    # There was no match of '^Match', insert at
+#    # the end of the file.
+#    printf '%s\n' "LoginGraceTime $var_sshd_login_grace_time" >> "/etc/ssh/sshd_config"
+#else
+#    head -n "$(( line_number - 1 ))" "/etc/ssh/sshd_config.bak" > "/etc/ssh/sshd_config"
+#    printf '%s\n' "LoginGraceTime $var_sshd_login_grace_time" >> "/etc/ssh/sshd_config"
+#    tail -n "+$(( line_number ))" "/etc/ssh/sshd_config.bak" >> "/etc/ssh/sshd_config"
+#fi
+## Clean up after ourselves.
+#rm "/etc/ssh/sshd_config.bak"
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'sshd_set_login_grace_time'
+#
+################################################################################
+## BEGIN fix (264 / 275) for 'sshd_set_loglevel_info_or_verbose'
+################################################################################
+#(>&2 echo "Remediating rule 264/275: 'sshd_set_loglevel_info_or_verbose'")
+## Remediation is applicable only in certain platforms
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
+#
+##!/bin/bash
+#
+#
+#var_sshd_set_loglevel='INFO'
+#
+#
+#
+#if [ -e "/etc/ssh/sshd_config" ] ; then
+#    
+#    LC_ALL=C sed -i "/^\s*LogLevel\s\+/Id" "/etc/ssh/sshd_config"
+#else
+#    touch "/etc/ssh/sshd_config"
+#fi
+#cp "/etc/ssh/sshd_config" "/etc/ssh/sshd_config.bak"
+## Insert before the line matching the regex '^Match'.
+#line_number="$(LC_ALL=C grep -n "^Match" "/etc/ssh/sshd_config.bak" | LC_ALL=C sed 's/:.*//g')"
+#if [ -z "$line_number" ]; then
+#    # There was no match of '^Match', insert at
+#    # the end of the file.
+#    printf '%s\n' "LogLevel $var_sshd_set_loglevel" >> "/etc/ssh/sshd_config"
+#else
+#    head -n "$(( line_number - 1 ))" "/etc/ssh/sshd_config.bak" > "/etc/ssh/sshd_config"
+#    printf '%s\n' "LogLevel $var_sshd_set_loglevel" >> "/etc/ssh/sshd_config"
+#    tail -n "+$(( line_number ))" "/etc/ssh/sshd_config.bak" >> "/etc/ssh/sshd_config"
+#fi
+## Clean up after ourselves.
+#rm "/etc/ssh/sshd_config.bak"
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'sshd_set_loglevel_info_or_verbose'
+#
+################################################################################
+## BEGIN fix (265 / 275) for 'sshd_set_max_auth_tries'
+################################################################################
+#(>&2 echo "Remediating rule 265/275: 'sshd_set_max_auth_tries'")
+## Remediation is applicable only in certain platforms
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
+#
+#
+#sshd_max_auth_tries_value='4'
+#
+#
+#
+#if [ -e "/etc/ssh/sshd_config" ] ; then
+#    
+#    LC_ALL=C sed -i "/^\s*MaxAuthTries\s\+/Id" "/etc/ssh/sshd_config"
+#else
+#    touch "/etc/ssh/sshd_config"
+#fi
+#cp "/etc/ssh/sshd_config" "/etc/ssh/sshd_config.bak"
+## Insert before the line matching the regex '^Match'.
+#line_number="$(LC_ALL=C grep -n "^Match" "/etc/ssh/sshd_config.bak" | LC_ALL=C sed 's/:.*//g')"
+#if [ -z "$line_number" ]; then
+#    # There was no match of '^Match', insert at
+#    # the end of the file.
+#    printf '%s\n' "MaxAuthTries $sshd_max_auth_tries_value" >> "/etc/ssh/sshd_config"
+#else
+#    head -n "$(( line_number - 1 ))" "/etc/ssh/sshd_config.bak" > "/etc/ssh/sshd_config"
+#    printf '%s\n' "MaxAuthTries $sshd_max_auth_tries_value" >> "/etc/ssh/sshd_config"
+#    tail -n "+$(( line_number ))" "/etc/ssh/sshd_config.bak" >> "/etc/ssh/sshd_config"
+#fi
+## Clean up after ourselves.
+#rm "/etc/ssh/sshd_config.bak"
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'sshd_set_max_auth_tries'
+#
+################################################################################
+## BEGIN fix (266 / 275) for 'sshd_set_max_sessions'
+################################################################################
+#(>&2 echo "Remediating rule 266/275: 'sshd_set_max_sessions'")
+## Remediation is applicable only in certain platforms
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
+#
+#
+#var_sshd_max_sessions='10'
+#
+#
+#
+#if [ -e "/etc/ssh/sshd_config" ] ; then
+#    
+#    LC_ALL=C sed -i "/^\s*MaxSessions\s\+/Id" "/etc/ssh/sshd_config"
+#else
+#    touch "/etc/ssh/sshd_config"
+#fi
+#cp "/etc/ssh/sshd_config" "/etc/ssh/sshd_config.bak"
+## Insert before the line matching the regex '^Match'.
+#line_number="$(LC_ALL=C grep -n "^Match" "/etc/ssh/sshd_config.bak" | LC_ALL=C sed 's/:.*//g')"
+#if [ -z "$line_number" ]; then
+#    # There was no match of '^Match', insert at
+#    # the end of the file.
+#    printf '%s\n' "MaxSessions $var_sshd_max_sessions" >> "/etc/ssh/sshd_config"
+#else
+#    head -n "$(( line_number - 1 ))" "/etc/ssh/sshd_config.bak" > "/etc/ssh/sshd_config"
+#    printf '%s\n' "MaxSessions $var_sshd_max_sessions" >> "/etc/ssh/sshd_config"
+#    tail -n "+$(( line_number ))" "/etc/ssh/sshd_config.bak" >> "/etc/ssh/sshd_config"
+#fi
+## Clean up after ourselves.
+#rm "/etc/ssh/sshd_config.bak"
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'sshd_set_max_sessions'
+#
+################################################################################
+## BEGIN fix (267 / 275) for 'sshd_set_maxstartups'
+################################################################################
+#(>&2 echo "Remediating rule 267/275: 'sshd_set_maxstartups'")
+## Remediation is applicable only in certain platforms
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
+#
+#
+#var_sshd_set_maxstartups='10:30:100'
+#
+#
+#
+#if [ -e "/etc/ssh/sshd_config" ] ; then
+#    
+#    LC_ALL=C sed -i "/^\s*MaxStartups\s\+/Id" "/etc/ssh/sshd_config"
+#else
+#    touch "/etc/ssh/sshd_config"
+#fi
+#cp "/etc/ssh/sshd_config" "/etc/ssh/sshd_config.bak"
+## Insert before the line matching the regex '^Match'.
+#line_number="$(LC_ALL=C grep -n "^Match" "/etc/ssh/sshd_config.bak" | LC_ALL=C sed 's/:.*//g')"
+#if [ -z "$line_number" ]; then
+#    # There was no match of '^Match', insert at
+#    # the end of the file.
+#    printf '%s\n' "MaxStartups $var_sshd_set_maxstartups" >> "/etc/ssh/sshd_config"
+#else
+#    head -n "$(( line_number - 1 ))" "/etc/ssh/sshd_config.bak" > "/etc/ssh/sshd_config"
+#    printf '%s\n' "MaxStartups $var_sshd_set_maxstartups" >> "/etc/ssh/sshd_config"
+#    tail -n "+$(( line_number ))" "/etc/ssh/sshd_config.bak" >> "/etc/ssh/sshd_config"
+#fi
+## Clean up after ourselves.
+#rm "/etc/ssh/sshd_config.bak"
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'sshd_set_maxstartups'
+#
+################################################################################
+## BEGIN fix (268 / 275) for 'sshd_use_approved_ciphers'
+################################################################################
+#(>&2 echo "Remediating rule 268/275: 'sshd_use_approved_ciphers'")
+## Remediation is applicable only in certain platforms
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
+#
+#
+#sshd_approved_ciphers='aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr'
+#
+#
+#
+## Test if the config_file is a symbolic link. If so, use --follow-symlinks with sed.
+## Otherwise, regular sed command will do.
+#sed_command=('sed' '-i')
+#if test -L "/etc/ssh/sshd_config"; then
+#    sed_command+=('--follow-symlinks')
+#fi
+#
+## If the cce arg is empty, CCE is not assigned.
+#if [ -z "" ]; then
+#    cce="CCE"
+#else
+#    cce=""
+#fi
+#
+## Strip any search characters in the key arg so that the key can be replaced without
+## adding any search characters to the config file.
+#stripped_key=$(sed 's/[\^=\$,;+]*//g' <<< "^Ciphers")
+#
+## shellcheck disable=SC2059
+#printf -v formatted_output "%s %s" "$stripped_key" "$sshd_approved_ciphers"
+#
+## If the key exists, change it. Otherwise, add it to the config_file.
+## We search for the key string followed by a word boundary (matched by \>),
+## so if we search for 'setting', 'setting2' won't match.
+#if LC_ALL=C grep -q -m 1 -i -e "^Ciphers\\>" "/etc/ssh/sshd_config"; then
+#    "${sed_command[@]}" "s/^Ciphers\\>.*/$formatted_output/gi" "/etc/ssh/sshd_config"
+#else
+#    # \n is precaution for case where file ends without trailing newline
+#    printf '\n# Per %s: Set %s in %s\n' "$cce" "$formatted_output" "/etc/ssh/sshd_config" >> "/etc/ssh/sshd_config"
+#    printf '%s\n' "$formatted_output" >> "/etc/ssh/sshd_config"
+#fi
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'sshd_use_approved_ciphers'
+#
+################################################################################
+## BEGIN fix (269 / 275) for 'sshd_use_approved_kexs'
+################################################################################
+#(>&2 echo "Remediating rule 269/275: 'sshd_use_approved_kexs'")
+## Remediation is applicable only in certain platforms
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
+#
+#
+#sshd_approved_kexs='ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,diffie-hellman-group14-sha256'
+#
+#
+#
+## Test if the config_file is a symbolic link. If so, use --follow-symlinks with sed.
+## Otherwise, regular sed command will do.
+#sed_command=('sed' '-i')
+#if test -L "/etc/ssh/sshd_config"; then
+#    sed_command+=('--follow-symlinks')
+#fi
+#
+## If the cce arg is empty, CCE is not assigned.
+#if [ -z "" ]; then
+#    cce="CCE"
+#else
+#    cce=""
+#fi
+#
+## Strip any search characters in the key arg so that the key can be replaced without
+## adding any search characters to the config file.
+#stripped_key=$(sed 's/[\^=\$,;+]*//g' <<< "^KexAlgorithms")
+#
+## shellcheck disable=SC2059
+#printf -v formatted_output "%s %s" "$stripped_key" "$sshd_approved_kexs"
+#
+## If the key exists, change it. Otherwise, add it to the config_file.
+## We search for the key string followed by a word boundary (matched by \>),
+## so if we search for 'setting', 'setting2' won't match.
+#if LC_ALL=C grep -q -m 1 -i -e "^KexAlgorithms\\>" "/etc/ssh/sshd_config"; then
+#    "${sed_command[@]}" "s/^KexAlgorithms\\>.*/$formatted_output/gi" "/etc/ssh/sshd_config"
+#else
+#    # \n is precaution for case where file ends without trailing newline
+#    printf '\n# Per %s: Set %s in %s\n' "$cce" "$formatted_output" "/etc/ssh/sshd_config" >> "/etc/ssh/sshd_config"
+#    printf '%s\n' "$formatted_output" >> "/etc/ssh/sshd_config"
+#fi
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'sshd_use_approved_kexs'
+#
+################################################################################
+## BEGIN fix (270 / 275) for 'sshd_use_approved_macs'
+################################################################################
+#(>&2 echo "Remediating rule 270/275: 'sshd_use_approved_macs'")
+## Remediation is applicable only in certain platforms
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
+#
+#
+#sshd_approved_macs='hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-256,hmac-sha2-512'
+#
+#
+#
+## Test if the config_file is a symbolic link. If so, use --follow-symlinks with sed.
+## Otherwise, regular sed command will do.
+#sed_command=('sed' '-i')
+#if test -L "/etc/ssh/sshd_config"; then
+#    sed_command+=('--follow-symlinks')
+#fi
+#
+## If the cce arg is empty, CCE is not assigned.
+#if [ -z "" ]; then
+#    cce="CCE"
+#else
+#    cce=""
+#fi
+#
+## Strip any search characters in the key arg so that the key can be replaced without
+## adding any search characters to the config file.
+#stripped_key=$(sed 's/[\^=\$,;+]*//g' <<< "^MACs")
+#
+## shellcheck disable=SC2059
+#printf -v formatted_output "%s %s" "$stripped_key" "$sshd_approved_macs"
+#
+## If the key exists, change it. Otherwise, add it to the config_file.
+## We search for the key string followed by a word boundary (matched by \>),
+## so if we search for 'setting', 'setting2' won't match.
+#if LC_ALL=C grep -q -m 1 -i -e "^MACs\\>" "/etc/ssh/sshd_config"; then
+#    "${sed_command[@]}" "s/^MACs\\>.*/$formatted_output/gi" "/etc/ssh/sshd_config"
+#else
+#    # \n is precaution for case where file ends without trailing newline
+#    printf '\n# Per %s: Set %s in %s\n' "$cce" "$formatted_output" "/etc/ssh/sshd_config" >> "/etc/ssh/sshd_config"
+#    printf '%s\n' "$formatted_output" >> "/etc/ssh/sshd_config"
+#fi
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'sshd_use_approved_macs'
+#
+################################################################################
+## BEGIN fix (271 / 275) for 'sshd_configure_allow_groups'
+################################################################################
+#(>&2 echo "Remediating rule 271/275: 'sshd_configure_allow_groups'")
+## Remediation is applicable only in certain platforms
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
+#
+#
+#var_sshd_allow_groups_valid='e39d05b72f25767869d44391919434896bb055772d7969f74472032b03bc18418911f3b0e6dd47ff8f3b2323728225286c3cb36914d28dc7db40bdd786159c0a'
+#
+#
+#
+## We don't add the default magic value to the sshd config file, since it's a security risk.
+#default_value="e39d05b72f25767869d44391919434896bb055772d7969f74472032b03bc18418911f3b0e6dd47ff8f3b2323728225286c3cb36914d28dc7db40bdd786159c0a"
+#
+#if [ "${var_sshd_allow_groups_valid}" != ${default_value} ]; then
+#    if [ -e "/etc/ssh/sshd_config" ] ; then
+#    
+#    LC_ALL=C sed -i "/^\s*AllowGroups\s\+/Id" "/etc/ssh/sshd_config"
+#else
+#    touch "/etc/ssh/sshd_config"
+#fi
+#cp "/etc/ssh/sshd_config" "/etc/ssh/sshd_config.bak"
+## Insert before the line matching the regex '^Match'.
+#line_number="$(LC_ALL=C grep -n "^Match" "/etc/ssh/sshd_config.bak" | LC_ALL=C sed 's/:.*//g')"
+#if [ -z "$line_number" ]; then
+#    # There was no match of '^Match', insert at
+#    # the end of the file.
+#    printf '%s\n' "AllowGroups $var_sshd_allow_groups_valid" >> "/etc/ssh/sshd_config"
+#else
+#    head -n "$(( line_number - 1 ))" "/etc/ssh/sshd_config.bak" > "/etc/ssh/sshd_config"
+#    printf '%s\n' "AllowGroups $var_sshd_allow_groups_valid" >> "/etc/ssh/sshd_config"
+#    tail -n "+$(( line_number ))" "/etc/ssh/sshd_config.bak" >> "/etc/ssh/sshd_config"
+#fi
+## Clean up after ourselves.
+#rm "/etc/ssh/sshd_config.bak"
+#fi
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'sshd_configure_allow_groups'
+#
+################################################################################
+## BEGIN fix (272 / 275) for 'sshd_configure_allow_users'
+################################################################################
+#(>&2 echo "Remediating rule 272/275: 'sshd_configure_allow_users'")
+## Remediation is applicable only in certain platforms
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
+#
+#
+#var_sshd_allow_users_valid='e39d05b72f25767869d44391919434896bb055772d7969f74472032b03bc18418911f3b0e6dd47ff8f3b2323728225286c3cb36914d28dc7db40bdd786159c0a'
+#
+#
+#
+## We don't add the default magic value to the sshd config file, since it's a security risk.
+#default_value="e39d05b72f25767869d44391919434896bb055772d7969f74472032b03bc18418911f3b0e6dd47ff8f3b2323728225286c3cb36914d28dc7db40bdd786159c0a"
+#
+#if [ "${var_sshd_allow_users_valid}" != ${default_value} ]; then
+#    if [ -e "/etc/ssh/sshd_config" ] ; then
+#    
+#    LC_ALL=C sed -i "/^\s*AllowUsers\s\+/Id" "/etc/ssh/sshd_config"
+#else
+#    touch "/etc/ssh/sshd_config"
+#fi
+#cp "/etc/ssh/sshd_config" "/etc/ssh/sshd_config.bak"
+## Insert before the line matching the regex '^Match'.
+#line_number="$(LC_ALL=C grep -n "^Match" "/etc/ssh/sshd_config.bak" | LC_ALL=C sed 's/:.*//g')"
+#if [ -z "$line_number" ]; then
+#    # There was no match of '^Match', insert at
+#    # the end of the file.
+#    printf '%s\n' "AllowUsers $var_sshd_allow_users_valid" >> "/etc/ssh/sshd_config"
+#else
+#    head -n "$(( line_number - 1 ))" "/etc/ssh/sshd_config.bak" > "/etc/ssh/sshd_config"
+#    printf '%s\n' "AllowUsers $var_sshd_allow_users_valid" >> "/etc/ssh/sshd_config"
+#    tail -n "+$(( line_number ))" "/etc/ssh/sshd_config.bak" >> "/etc/ssh/sshd_config"
+#fi
+## Clean up after ourselves.
+#rm "/etc/ssh/sshd_config.bak"
+#fi
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'sshd_configure_allow_users'
+#
+################################################################################
+## BEGIN fix (273 / 275) for 'sshd_configure_deny_groups'
+################################################################################
+#(>&2 echo "Remediating rule 273/275: 'sshd_configure_deny_groups'")
+## Remediation is applicable only in certain platforms
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
+#
+#
+#var_sshd_deny_groups_valid='e39d05b72f25767869d44391919434896bb055772d7969f74472032b03bc18418911f3b0e6dd47ff8f3b2323728225286c3cb36914d28dc7db40bdd786159c0a'
+#
+#
+#
+## We don't add the default magic value to the sshd config file, since it's a security risk.
+#default_value="e39d05b72f25767869d44391919434896bb055772d7969f74472032b03bc18418911f3b0e6dd47ff8f3b2323728225286c3cb36914d28dc7db40bdd786159c0a"
+#
+#if [ "${var_sshd_deny_groups_valid}" != ${default_value} ]; then
+#    if [ -e "/etc/ssh/sshd_config" ] ; then
+#    
+#    LC_ALL=C sed -i "/^\s*DenyGroups\s\+/Id" "/etc/ssh/sshd_config"
+#else
+#    touch "/etc/ssh/sshd_config"
+#fi
+#cp "/etc/ssh/sshd_config" "/etc/ssh/sshd_config.bak"
+## Insert before the line matching the regex '^Match'.
+#line_number="$(LC_ALL=C grep -n "^Match" "/etc/ssh/sshd_config.bak" | LC_ALL=C sed 's/:.*//g')"
+#if [ -z "$line_number" ]; then
+#    # There was no match of '^Match', insert at
+#    # the end of the file.
+#    printf '%s\n' "DenyGroups $var_sshd_deny_groups_valid" >> "/etc/ssh/sshd_config"
+#else
+#    head -n "$(( line_number - 1 ))" "/etc/ssh/sshd_config.bak" > "/etc/ssh/sshd_config"
+#    printf '%s\n' "DenyGroups $var_sshd_deny_groups_valid" >> "/etc/ssh/sshd_config"
+#    tail -n "+$(( line_number ))" "/etc/ssh/sshd_config.bak" >> "/etc/ssh/sshd_config"
+#fi
+## Clean up after ourselves.
+#rm "/etc/ssh/sshd_config.bak"
+#fi
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'sshd_configure_deny_groups'
+#
+################################################################################
+## BEGIN fix (274 / 275) for 'sshd_configure_deny_users'
+################################################################################
+#(>&2 echo "Remediating rule 274/275: 'sshd_configure_deny_users'")
+## Remediation is applicable only in certain platforms
+#if [ ! -f /.dockerenv ] && [ ! -f /run/.containerenv ]; then
+#
+#
+#var_sshd_deny_users_valid='e39d05b72f25767869d44391919434896bb055772d7969f74472032b03bc18418911f3b0e6dd47ff8f3b2323728225286c3cb36914d28dc7db40bdd786159c0a'
+#
+#
+#
+## We don't add the default magic value to the sshd config file, since it's a security risk.
+#default_value="e39d05b72f25767869d44391919434896bb055772d7969f74472032b03bc18418911f3b0e6dd47ff8f3b2323728225286c3cb36914d28dc7db40bdd786159c0a"
+#
+#if [ "${var_sshd_deny_users_valid}" != ${default_value} ]; then
+#    if [ -e "/etc/ssh/sshd_config" ] ; then
+#    
+#    LC_ALL=C sed -i "/^\s*DenyUsers\s\+/Id" "/etc/ssh/sshd_config"
+#else
+#    touch "/etc/ssh/sshd_config"
+#fi
+#cp "/etc/ssh/sshd_config" "/etc/ssh/sshd_config.bak"
+## Insert before the line matching the regex '^Match'.
+#line_number="$(LC_ALL=C grep -n "^Match" "/etc/ssh/sshd_config.bak" | LC_ALL=C sed 's/:.*//g')"
+#if [ -z "$line_number" ]; then
+#    # There was no match of '^Match', insert at
+#    # the end of the file.
+#    printf '%s\n' "DenyUsers $var_sshd_deny_users_valid" >> "/etc/ssh/sshd_config"
+#else
+#    head -n "$(( line_number - 1 ))" "/etc/ssh/sshd_config.bak" > "/etc/ssh/sshd_config"
+#    printf '%s\n' "DenyUsers $var_sshd_deny_users_valid" >> "/etc/ssh/sshd_config"
+#    tail -n "+$(( line_number ))" "/etc/ssh/sshd_config.bak" >> "/etc/ssh/sshd_config"
+#fi
+## Clean up after ourselves.
+#rm "/etc/ssh/sshd_config.bak"
+#fi
+#
+#else
+#    >&2 echo 'Remediation is not applicable, nothing was done'
+#fi
+## END fix for 'sshd_configure_deny_users'
 
 ###############################################################################
 # BEGIN fix (275 / 275) for 'package_xorg-x11-server-common_removed'

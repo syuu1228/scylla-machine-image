@@ -235,7 +235,7 @@ WantedBy=multi-user.target
     # apply CIS rules
     run('apt-get install -y apparmor-utils', shell=True, check=True)
     run('bash /tmp/remediation-script.sh', shell=True, check=True)
-    run('bash /tmp/iptables.sh', shell=True, check=True)
+#    run('bash /tmp/iptables.sh', shell=True, check=True)
     run('apt-get install -y iptables-persistent netfilter-persistent', shell=True, check=True)
     run('netfilter-persistent save', shell=True, check=True)
     run('apt purge -y telnet rsync ufw systemd-timesyncd', shell=True, check=True)
