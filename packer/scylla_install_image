@@ -223,6 +223,7 @@ mounts:
 '''[1:-1]
         with open('/etc/cloud/cloud.cfg.d/00-azure-swap.cfg', 'w') as f:
             f.write(swap_cfg)
+        run('cloud-init clean', shell=True, check=True)
         with open('/etc/hosts', 'a') as f:
             f.write('\n\n169.254.169.254    metadata.azure.internal\n')
 
