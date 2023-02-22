@@ -195,7 +195,7 @@
     },
     {
         "inline": [
-            "if [ {{build_name}} = gce -o {{build_name}} = azure ]; then sudo userdel -r -f {{user `ssh_username`}}; fi"
+            "if [ {{build_name}} = gce -o {{build_name}} = azure ]; then sudo cloud-init clean; fi"
         ],
         "type": "shell"
     }
