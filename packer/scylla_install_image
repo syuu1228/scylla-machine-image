@@ -126,6 +126,7 @@ if __name__ == '__main__':
         grub_variable = 'GRUB_CMDLINE_LINUX_DEFAULT'
     elif args.target_cloud == 'gce':
         run('apt-get purge -y rsyslog', shell=True, check=True)
+        run('rm -f /var/log/{auth.log,dmesg,dmesg.*,kern.log,syslog}', shell=True, check=True)
         sysconfig_opt = '--disable-writeback-cache'
         kernel_opt = ''
         grub_variable = 'GRUB_CMDLINE_LINUX_DEFAULT'
@@ -185,6 +186,17 @@ WantedBy=multi-user.target
     profile = '/etc/skel/.profile'
     with open(profile, 'a') as f:
         f.write('\n\n/opt/scylladb/scylla-machine-image/scylla_login\n')
+
+    journal_conf = '''
+[Journal]
+RateLimitIntervalSec=0
+RateLimitBurst=0
+SystemMaxUse=2G
+SystemKeepFree=2G
+'''[1:-1]
+    os.makedirs('/etc/systemd/journald.conf.d', exist_ok=True)
+    with open('/etc/systemd/journald.conf.d/00-journal-size.conf', 'w') as f:
+        f.write(journal_conf)
 
     # On AWS, ssh user is statically created at AMI building time, so we need to
     # change it to 'scyllaadm`.
