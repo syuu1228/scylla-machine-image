@@ -1,0 +1,3 @@
+[submodule "vendor/cloud-init"]
+	path = vendor/cloud-init
+	url = ../../dgzlopes/cloud-detect.git

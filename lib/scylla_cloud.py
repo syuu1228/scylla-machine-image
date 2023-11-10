@@ -18,6 +18,7 @@ import glob
 import distro
 import base64
 import datetime
+import cloud_detect
 from subprocess import run, CalledProcessError
 from abc import ABCMeta, abstractmethod
 
@@ -823,15 +824,23 @@ class aws_instance(cloud_instance):
             return ''
 
 
+_identify_cloud_result = None
+def identify_cloud():
+    global _identify_cloud_result
+    if _identify_cloud_result:
+        return _identify_cloud_result
+    result = cloud_detect.provider(60)
+    _identify_cloud_result = result
+    return result
 
 def is_ec2():
-    return aws_instance.is_aws_instance()
+    return identify_cloud() == 'aws'
 
 def is_gce():
-    return gcp_instance.is_gce_instance()
+    return identify_cloud() == 'gcp'
 
 def is_azure():
-    return azure_instance.is_azure_instance()
+    return identify_cloud() == 'azure'
 
 def get_cloud_instance():
     if is_ec2():
