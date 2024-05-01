@@ -153,7 +153,7 @@
       "managed_image_name": "{{user `image_name`| clean_resource_name}}",
       "os_type": "Linux",
       "image_publisher": "Canonical",
-      "image_offer": "0001-com-ubuntu-minimal-jammy",
+      "image_offer": "0001-com-ubuntu-minimal-noble",
       "image_sku": "minimal-22_04-lts-gen2",
       "azure_tags": {
         "scylla_version": "{{user `scylla_full_version`}}",
