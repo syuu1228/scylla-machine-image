@@ -126,6 +126,10 @@ if __name__ == '__main__':
     elif args.target_cloud == 'azure':
         kernel_opt = ' rootdelay=300'
         grub_variable = 'GRUB_CMDLINE_LINUX'
+        run('cat /etc/chrony/chrony.conf', shell=True, check=True)
+        run('chronyc sources', shell=True, check=True)
+        run('timedatectl status', shell=True, check=True)
+        sys.exit(1)
 
     run('systemctl disable apt-daily-upgrade.timer apt-daily.timer dpkg-db-backup.timer motd-news.timer', shell=True, check=True)
     run('systemctl daemon-reload', shell=True, check=True)
