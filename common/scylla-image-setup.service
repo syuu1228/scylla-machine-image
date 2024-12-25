@@ -2,6 +2,7 @@
 Description=Scylla Cloud Image Setup service
 Before=scylla-server.service
 After=network.target
+After=cloud-final.service
 
 [Service]
 Type=oneshot
@@ -11,3 +12,4 @@ TimeoutStartSec=900
 
 [Install]
 RequiredBy=scylla-server.service
+WantedBy=cloud-init.target
