@@ -19,6 +19,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--target-cloud', choices=['aws', 'gce', 'azure'], help='specify target cloud')
     args = parser.parse_args()
+    apt_env = os.environ.copy()
+    apt_env['DEBIAN_FRONTEND'] = 'noninteractive'
+    run('apt-get update', shell=True, check=True)
 
     # xccdf_org.ssgproject.content_rule_grub2_audit_argument
     kernel_opt = 'audit=1'
@@ -238,3 +241,33 @@ MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,h
     with open('/etc/ssh/sshd_config.d/99-cis-rules.conf', 'w') as f:
         f.write(sshd_config)
     run('systemctl restart ssh.service', shell=True, check=True)
+
+
+    # xccdf_org.ssgproject.content_rule_accounts_password_pam_dcredit
+    run('apt-get install -y libpam-runtime', shell=True, check=True, env=apt_env)
+    var_password_pam_dcredit = '-1'
+
+    # Strip any search characters in the key arg so that the key can be replaced without
+    # adding any search characters to the config file.
+    stripped_key = re.sub(r'[\^=\$,;+]*', '', "^dcredit")
+
+    # shellcheck disable=SC2059
+    formatted_output = f"{stripped_key} = {var_password_pam_dcredit}"
+
+    # If the key exists, change it. Otherwise, add it to the config_file.
+    # We search for the key string followed by a word boundary (matched by \>),
+    # so if we search for 'setting', 'setting2' won't match.
+    config_file = "/etc/security/pwquality.conf"
+
+    with open(config_file, 'r') as f:
+        content = f.read()
+
+    if re.search(r'^dcredit\b', content, re.MULTILINE | re.IGNORECASE):
+        # Replace the existing line
+        modified_content = re.sub(r'^dcredit\b.*', formatted_output, content, flags=re.MULTILINE | re.IGNORECASE)
+        with open(config_file, 'w') as f:
+            f.write(modified_content)
+    else:
+        # \n is precaution for case where file ends without trailing newline
+        with open(config_file, 'a') as f:
+            f.write(f"{formatted_output}\n")
