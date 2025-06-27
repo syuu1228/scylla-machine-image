@@ -72,7 +72,9 @@ if [[ ! -e dist/debian/build_deb.sh ]]; then
     exit 1
 fi
 
-pkg_install build-essential
+if is_debian; then
+    apt_install build-essential
+fi
 pkg_install devscripts
 pkg_install debhelper
 pkg_install fakeroot
