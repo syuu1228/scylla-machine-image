@@ -9,6 +9,7 @@ import os
 import sys
 import re
 import argparse
+import shutil
 from subprocess import run
 
 if __name__ == '__main__':
@@ -247,3 +248,50 @@ MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,h
         file.write("readonly TMOUT\n")
         file.write("export TMOUT\n")
     os.chmod('/etc/profile.d/tmout.sh', 0o755)
+
+
+    # xccdf_org.ssgproject.content_rule_sudo_custom_logfile
+    var_sudo_logfile = '/var/log/sudo.log'
+
+    # Check if /etc/sudoers is valid
+    visudo_check = run(['/usr/sbin/visudo', '-qcf', '/etc/sudoers'],
+                                capture_output=True)
+    if visudo_check.returncode == 0:
+        # Backup sudoers file
+        shutil.copy('/etc/sudoers', '/etc/sudoers.bak')
+
+        # Read sudoers file
+        with open('/etc/sudoers', 'r') as f:
+            sudoers_content = f.read()
+
+        # Check if logfile option exists
+        logfile_pattern = r'^[\s]*Defaults[\s]*\blogfile\s*=\s*(?:"?([^",\s]+)"?)\b.*$'
+        if not re.search(logfile_pattern, sudoers_content, re.MULTILINE):
+            # sudoers file doesn't define Option logfile
+            with open('/etc/sudoers', 'a') as f:
+                f.write(f"Defaults logfile={var_sudo_logfile}\n")
+        else:
+            # sudoers file defines Option logfile, remediate if appropriate value is not set
+            specific_logfile_pattern = f"^[\\s]*Defaults.*\\blogfile={re.escape(var_sudo_logfile)}\\b.*$"
+            if not re.search(specific_logfile_pattern, sudoers_content, re.MULTILINE):
+
+                escaped_variable = var_sudo_logfile.replace('/', r'\/')
+                pattern = r"(^[\s]*Defaults.*\blogfile=)[-]?.+(\b.*$)"
+                replacement = f"\\1{escaped_variable}\\2"
+                modified_content = re.sub(pattern, replacement, sudoers_content, flags=re.MULTILINE)
+
+                with open('/etc/sudoers', 'w') as f:
+                    f.write(modified_content)
+
+        # Check validity of sudoers and cleanup bak
+        final_check = run(['/usr/sbin/visudo', '-qcf', '/etc/sudoers'],
+                                   capture_output=True)
+        if final_check.returncode == 0:
+            os.remove('/etc/sudoers.bak')
+        else:
+            print("Fail to validate remediated /etc/sudoers, reverting to original file.")
+            shutil.move('/etc/sudoers.bak', '/etc/sudoers')
+            sys.exit(1)
+    else:
+        print("Skipping remediation, /etc/sudoers failed to validate")
+        sys.exit(1)
