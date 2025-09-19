@@ -406,3 +406,16 @@ ucredit = -1
             except (OSError, FileNotFoundError):
                 # Silently ignore errors (equivalent to -f flag in chgrp)
                 pass
+
+    # xccdf_org.ssgproject.content_rule_file_ownership_home_directories
+    # awk -F':' '{ if ($3 >= 1000 && $3 != 65534) system("chown -f " $3" "$6) }' /etc/passwd
+    # Get all user entries from the system password database
+    for user_entry in pwd.getpwall():
+        uid = user_entry.pw_uid      # $3 in awk (user ID)
+        home_dir = user_entry.pw_dir # $6 in awk (home directory)
+
+        # Apply the same condition: if ($3 >= 1000 && $3 != 65534)
+        if uid >= 1000 and uid != 65534:
+            # system("chown -f " $3" "$6) equivalent
+            os.chown(home_dir, uid, -1)  # -1 keeps the existing group unchanged
+
