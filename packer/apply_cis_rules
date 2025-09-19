@@ -9,6 +9,7 @@ import os
 import sys
 import re
 import argparse
+import pwd
 from subprocess import run
 
 if __name__ == '__main__':
@@ -381,3 +382,9 @@ ucredit = -1
     if not success:
         with open('/etc/login.defs', 'a') as f:
             f.write(f"PASS_MAX_DAYS      {var_accounts_maximum_age_login_defs}\n")
+
+
+    # xccdf_org.ssgproject.content_rule_accounts_user_interactive_home_directory_exists
+    for entry in pwd.getpwall():
+        if entry.pw_uid >= 1000 and entry.pw_uid != 65534:
+            run(['mkhomedir_helper', entry.pw_name, '0077'])
