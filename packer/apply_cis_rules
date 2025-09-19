@@ -388,3 +388,21 @@ ucredit = -1
     for entry in pwd.getpwall():
         if entry.pw_uid >= 1000 and entry.pw_uid != 65534:
             run(['mkhomedir_helper', entry.pw_name, '0077'])
+
+
+    # xccdf_org.ssgproject.content_rule_file_groupownership_home_directories
+    # Iterate through all users using pwd module
+    for user_entry in pwd.getpwall():
+        # Get UID, GID, and home directory from pwd structure
+        uid = user_entry.pw_uid    # $3 in awk
+        gid = user_entry.pw_gid    # $4 in awk
+        home_dir = user_entry.pw_dir  # $6 in awk
+
+        # Check if UID >= 1000 and UID != 65534
+        if uid >= 1000 and uid != 65534:
+            # Change group ownership using Python API (equivalent to chgrp -f)
+            try:
+                os.chown(home_dir, -1, gid)
+            except (OSError, FileNotFoundError):
+                # Silently ignore errors (equivalent to -f flag in chgrp)
+                pass
