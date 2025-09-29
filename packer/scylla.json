@@ -231,7 +231,19 @@
             "if [ {{build_name}} = gce -o {{build_name}} = azure ]; then sudo userdel -r -f {{user `ssh_username`}}; fi"
         ],
         "type": "shell"
-    }
+    },
+    {
+      "source": "/etc/cloud/cloud-init.cfg",
+      "destination": "build/",
+      "direction": "download",
+      "type": "file"
+    },
+    {
+      "source": "/etc/cloud/cloud-cfg.d/",
+      "destination": "build/",
+      "direction": "download",
+      "type": "file"
+    },
   ],
   "variables": {
     "access_key": "",
